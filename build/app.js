@@ -14,9 +14,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.App = void 0;
 const express_1 = __importDefault(require("express"));
+const path_1 = __importDefault(require("path"));
 class App {
     constructor() {
         this.app = express_1.default();
+        this.settings();
+        this.routes();
+    }
+    routes() {
+        this.app.get('/', (req, res) => {
+            res.render('index.ejs');
+        });
+    }
+    settings() {
+        this.app.set("view engine", "ejs");
+        this.app.set("views", path_1.default.join(__dirname, "views"));
     }
     listen() {
         return __awaiter(this, void 0, void 0, function* () {
