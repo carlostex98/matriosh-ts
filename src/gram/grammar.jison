@@ -32,6 +32,9 @@ string  (\"[^"]*\")
 "!"                   return '!'
 "="                   return '='
 
+"["                     return '['
+"]"                     return ']'
+
 "("                     return '('
 ")"                     return ')' 
 "{"                     return '{'
@@ -46,3 +49,20 @@ string  (\"[^"]*\")
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		            return 'EOF'
 
+/lex
+
+%left '||'
+%left '&&'
+%left '==', '!='
+%left '>=', '<=', '<', '>'
+%left '+' '-'
+%left '*' '/'
+
+%start Startup 
+
+%%
+
+Startup
+    : Instructions EOF{
+        return $1;
+    }
