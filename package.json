@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "hola": "npx tsc && node build/index.js"
+    "run-server": "npx tsc && node build/index.js",
+    "run-all": "node src/tools/copyAssets.js && npx tsc && node build/index.js",
+    "compile-fixer": "tsc src/tools/copyAssets.ts"
+    
   },
   "keywords": [],
   "author": "",
