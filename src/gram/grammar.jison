@@ -51,6 +51,8 @@ string2  (\'[^"]*\')
 "do"                    return 'DO'
 "for"                   return 'FOR'
 "switch"                return 'SWITCH'
+"case"                  return 'CASE'
+"default"               return 'DEFAULT'
 "continue"              return 'CONTINUE'
 "return"                return 'RETURN'
 "console"               return 'CONSOLE'
@@ -87,7 +89,7 @@ Startup
 
 Instructions
     : instruction Instructions {$1.push($2);}
-    | instruction {$$=$1;}
+    | instruction {$$=[$1];}
 ;
 
 instruccion
@@ -102,28 +104,45 @@ instruccion
     | statFunc         { $$ = $1; }
     | statGraph        { $$ = $1; }
     | statCreateVar    { $$ = $1; }
+    | statConsole      { $$ = $1; }
 ;
 
 statGraph
-    : 
-
+    : 'GP_TS' ';' { $$ = $1 + $2; }
+;
 statIf
-    : IF '(' genExpr ')'
+    : IF '(' genExpr ')' '{' Instructions '}' moreIf {$$ = $1+$2+$3+$4+$5+$6+$7+$8;}
+;
+
+moreIf
+    : ELSE '{' Instructions '}' {$$=$1 + $2 + $4;}
+    | ELSE statIf {$$=$1 + $2;}
+    | /* empty */   {$$="";}
+;
 
 statWhile 
-    : WHILE '(' genExpr ')' '{' Instructions '}' { }
+    : WHILE '(' genExpr ')' '{' Instructions '}' { $$ = $1+$2+$3+$4+$5+$6+$7; }
 ;
 
 statDo
-    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { }
+    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { $$ = $1+$2+$3+$4+$5+$6+$7+$9; }
 ;
 
 statFor
-    : FOR '(' forVariant ')' '{' Instructions '}' { }
+    : FOR '(' forVariant ')' '{' Instructions '}' { $$ = $1+$2+$3+$4+$5+$6+$7; }
 ;
 
 statSwitch
-    : SWITCH '(' genExpr ')' '{' sw-cases '}'  { }
+    : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = $1+$2+$3+$4+$5+$6+$7;}
+;
+
+swCases 
+    : swCase swCases {$1.push($2);}
+    | swCase {$$=[$1];}
+;
+swCase
+    : CASE genExpr ':' '{' Instructions '}' { $$ = $1+$2+$3+$4+$5+$6; }
+    | DEFAULT '{' Instructions '}' {$$ = $1+$2+$3+$4;} 
 ;
 
 statBreak 
@@ -136,10 +155,15 @@ statContinue
 
 /* here comes the magic */
 statFunc 
-    : FUNCTION '(' paramsFunc ')' '{' Instructions '}'  {} 
-    | FUNCTION '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  {} 
+    : FUNCTION '(' paramsFunc ')' '{' Instructions '}'  {$$ = $1+$2+$3+$4+$5+$6+$7;} 
+    | FUNCTION '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  {$$ = $1+$2+$3+$4+$5+$6+$7+$8+$9;} 
 ;
 
-statFonsole
-    : CONSOLE '.' LOG '(' Instructions ')' ';' {}
-; 
+statConsole
+    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$=$1+$2 }
+;
+
+genExpr 
+    : E + 
+
+
