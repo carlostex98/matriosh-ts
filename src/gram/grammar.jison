@@ -58,6 +58,10 @@ string2  (\'[^"]*\')
 "console"               return 'CONSOLE'
 "log"                   return 'LOG'
 "function"              return 'FUNCTION'
+
+"let"                   return 'LET'
+"const"                 return 'CONST'
+
 /*value types*/
 "string"                return "T_STRING"
 "number"                return "T_NUMBER"
@@ -105,6 +109,15 @@ instruccion
     | statGraph        { $$ = $1; }
     | statCreateVar    { $$ = $1; }
     | statConsole      { $$ = $1; }
+    | statCall         { $$ = $1; }
+    | varDefinition    { $$ = $1; }
+;
+
+varDefinition
+    : LET ID '=' genExpr ';'{}
+    | CONST ID '=' genExpr ';'{}
+    | LET ID ';'{}
+    | CONST ID ';'{}
 ;
 
 statGraph
@@ -164,6 +177,37 @@ statConsole
 ;
 
 genExpr 
-    : E + 
+    : genExpr '+' genExpr {}
+    | genExpr '-' genExpr {}
+    | genExpr '*' genExpr {}
+    | genExpr '/' genExpr {}
+    | genExpr '^' genExpr {}
+    | genExpr '<' genExpr {}
+    | genExpr '>' genExpr {}
+    | genExpr '<=' genExpr {}
+    | genExpr '>=' genExpr {}
+    | genExpr '==' genExpr {}
+    | genExpr '!=' genExpr {}
+    | genExpr '&&' genExpr {}
+    | genExpr '||' genExpr {}
+    | otro {}
+;
 
+otro
+    : '(' genExpr ')' {}
+    | NUMBER {}
+    | DECIMAL {}
+    | STRING {}
+    | ID {}
+    | statCall {}
+;
 
+statCall 
+    : ID '(' ')' {}
+    | ID '(' paramsCall ')' {}
+;
+
+paramsCall
+    : paramsCall ',' genExpr {}
+    | genExpr {}
+;
