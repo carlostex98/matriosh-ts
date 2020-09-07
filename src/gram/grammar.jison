@@ -228,7 +228,7 @@ typeReturn
 
 
 statConsole
-    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$ = $1 + $2; }
+    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$ = $1 + $2 + $3 + $4 + $6 + $7; }
 ;
 
 genExpr 
