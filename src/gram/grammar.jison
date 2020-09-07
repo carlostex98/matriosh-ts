@@ -24,6 +24,7 @@ string2  (\'[^"]*\')
 "+"                     return '+'
 "^"                     return '^'
 "."                     return '.'
+"%"                     return '%'
 
 "<"                   return '<'
 ">"                   return '>'
@@ -61,6 +62,9 @@ string2  (\'[^"]*\')
 
 "let"                   return 'LET'
 "const"                 return 'CONST'
+"var"                   return 'VAR'
+"of"                    return 'OF'
+"in"                    return 'IN'
 
 /*value types*/
 "string"                return "T_STRING"
@@ -110,14 +114,25 @@ instruccion
     | statCreateVar    { $$ = $1; }
     | statConsole      { $$ = $1; }
     | statCall         { $$ = $1; }
+    | statIncremento   { $$ = $1; }
     | varDefinition    { $$ = $1; }
+    | statReturn       { $$ = $1; }
+    | varAsig          { $$ = $1; }
+;
+
+statReturn
+    : RETURN genExpr ';'{}
+    | RETURN  ';' {}
 ;
 
 varDefinition
     : LET ID '=' genExpr ';'{}
     | CONST ID '=' genExpr ';'{}
     | LET ID ';'{}
-    | CONST ID ';'{}
+;
+
+varAsig
+    : ID '=' genExpr ';' {}
 ;
 
 statGraph
@@ -145,6 +160,29 @@ statFor
     : FOR '(' forVariant ')' '{' Instructions '}' { $$ = $1+$2+$3+$4+$5+$6+$7; }
 ;
 
+forVariant
+    : VAR ID OF ID                      { $$ = $1+$2+$3+$4; }
+    | VAR ID OF ID                      { $$ = $1+$2+$3+$4; }
+    | varFor ';' genExpr ';' pasoFor    { $$ = $1+$2+$3+$4+$5; }
+;
+
+pasoFor
+    : ID '+''+'';'
+    | ID '-''-'';'
+    | ID '=' genExpr
+;
+
+
+varFor
+    : LET ID '=' genExpr {}
+    | ID '=' genExpr { $$ = $1+$2+$3; }
+;
+
+unarOpr
+    : ID '+''+'';' { $$ = $1+$2+$3; }
+    | ID '-''+'';' { $$ = $1+$2+$3; }
+;
+
 statSwitch
     : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = $1+$2+$3+$4+$5+$6+$7;}
 ;
@@ -168,38 +206,58 @@ statContinue
 
 /* here comes the magic */
 statFunc 
-    : FUNCTION '(' paramsFunc ')' '{' Instructions '}'  {$$ = $1+$2+$3+$4+$5+$6+$7;} 
-    | FUNCTION '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  {$$ = $1+$2+$3+$4+$5+$6+$7+$8+$9;} 
+    : FUNCTION '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  {$$ = $1+$2+$3+$4+$5+$6+$7+$8+$9;} 
 ;
 
+paramsFunc
+    : paramsFunc, tpf  { $$ = $1+$2; }
+    | tpf              { $$ = $1; }
+;
+
+tpf
+    : ID ':' typeReturn { $$ = $1 + $2 + $3; }
+;
+
+typeReturn
+    : T_VOID    { $$ = $1; }
+    | T_NUMBER  { $$ = $1; }
+    | T_BOOLEAN { $$ = $1; }
+    | T_STRING  { $$ = $1; }
+;
+
+
+
 statConsole
-    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$=$1+$2 }
+    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$ = $1 + $2; }
 ;
 
 genExpr 
-    : genExpr '+' genExpr {}
-    | genExpr '-' genExpr {}
-    | genExpr '*' genExpr {}
-    | genExpr '/' genExpr {}
-    | genExpr '^' genExpr {}
-    | genExpr '<' genExpr {}
-    | genExpr '>' genExpr {}
-    | genExpr '<=' genExpr {}
-    | genExpr '>=' genExpr {}
-    | genExpr '==' genExpr {}
-    | genExpr '!=' genExpr {}
-    | genExpr '&&' genExpr {}
-    | genExpr '||' genExpr {}
-    | otro {}
+    : genExpr '+' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '-' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '*' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '/' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '^' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '<' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '>' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '<=' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '>=' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '==' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '!=' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '&&' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '%' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '||' genExpr { $$ = $1 + $2 + $3; }
+    | otro { $$ = $1; }
 ;
 
 otro
-    : '(' genExpr ')' {}
-    | NUMBER {}
-    | DECIMAL {}
-    | STRING {}
-    | ID {}
-    | statCall {}
+    : '(' genExpr ')'   { $$ = $1 + $2 + $3; }
+    | NUMBER            { $$ = $1; }
+    | DECIMAL           { $$ = $1; }
+    | STRING            { $$ = $1; }
+    | ID                { $$ = $1; }
+    | '-' genExpr       { $$ = $1 + $2; }
+    | '!' genExpr       { $$ = $1 + $2; }
+    | statCall          { $$ = $1; }
 ;
 
 statCall 
