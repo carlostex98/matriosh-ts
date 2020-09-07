@@ -20,6 +20,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const shell = __importStar(require("shelljs"));
+let first = 123;
 // Copy all the view templates
 shell.cp("-R", "src/views", "build/");
+shell.cp("-R", "src/gram", "build/");
 //# sourceMappingURL=copyAssets.js.map

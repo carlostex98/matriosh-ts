@@ -1,1 +1,1 @@
-{"version":3,"file":"copyAssets.js","sourceRoot":"","sources":["../../src/tools/copyAssets.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;AAAA,+CAAiC;AAEjC,8BAA8B;AAC9B,KAAK,CAAC,EAAE,CAAE,IAAI,EAAE,WAAW,EAAE,QAAQ,CAAE,CAAC"}
+{"version":3,"file":"copyAssets.js","sourceRoot":"","sources":["../../src/tools/copyAssets.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;AAAA,+CAAiC;AAEjC,IAAI,KAAK,GAAU,GAAG,CAAA;AACtB,8BAA8B;AAC9B,KAAK,CAAC,EAAE,CAAE,IAAI,EAAE,WAAW,EAAE,QAAQ,CAAE,CAAC;AACxC,KAAK,CAAC,EAAE,CAAE,IAAI,EAAE,UAAU,EAAE,QAAQ,CAAE,CAAC"}
