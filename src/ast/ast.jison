@@ -1,49 +1,15 @@
 %{
-    //const {Arithmetic, ArithmeticOption} = require('../Expression/Arithmetic');
-    //import of all the needs
-    function sr(a){
-        var m = "";
-        for (i = 0; i < a.length; i++) {
-            m += a[i] + " ";
-        }
-        return m;
+    
+    let rs = "";//donde habita el reporte
+    let nodos = [];
+    let relacion = [];
+
+    function nuevoNodo(){
+
     }
 
-    function desanidar(m){
-        var res = "";
-        var res2 = "";
-        var mx = [];
-        var op = [];
+    function creaRelaciones(padre, hijos){
 
-        for (i = 0; i < m.length; i++) {
-            res = m[i].substr(0,8);
-            if(res == "function"){
-                mx.push(m[i]);
-            }else{
-                op.push(m[i]);
-            }
-        }
-
-        res = "";
-        res2 = "";
-
-        for (i = 0; i < mx.length; i++) {
-            res += mx[i];
-        }
-
-        for (i = 0; i < op.length; i++) {
-            res2 += op[i];
-        }
-
-        return [res, res2];
-    }
-
-    function formater(s){
-        var m = "";
-        for (i = 0; i < s.length; i++) {
-            m += s[i]+"\n";
-        }
-        return m;
     }
 
 %}

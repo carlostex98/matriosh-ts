@@ -1,6 +1,51 @@
 %{
     //const {Arithmetic, ArithmeticOption} = require('../Expression/Arithmetic');
     //import of all the needs
+    function sr(a){
+        var m = "";
+        for (i = 0; i < a.length; i++) {
+            m += a[i] + " ";
+        }
+        return m;
+    }
+
+    function desanidar(m){
+        var res = "";
+        var res2 = "";
+        var mx = [];
+        var op = [];
+
+        for (i = 0; i < m.length; i++) {
+            res = m[i].substr(0,8);
+            if(res == "function"){
+                mx.push(m[i]);
+            }else{
+                op.push(m[i]);
+            }
+        }
+
+        res = "";
+        res2 = "";
+
+        for (i = 0; i < mx.length; i++) {
+            res += mx[i];
+        }
+
+        for (i = 0; i < op.length; i++) {
+            res2 += op[i];
+        }
+
+        return [res, res2];
+    }
+
+    function formater(s){
+        var m = "";
+        for (i = 0; i < s.length; i++) {
+            m += s[i]+"\n";
+        }
+        return m;
+    }
+
 %}
 
 %lex
@@ -11,7 +56,8 @@ string  (\"[^"]*\")
 string2  (\'[^"]*\')
 %%
 \s+                   /* skip whitespace */
-
+[/][/].*                                {}  //una linea
+[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]	    {} //multilinea
 {number}                return 'NUMBER'
 {decimal}               return 'DECIMAL'
 {string}                return 'STRING'
@@ -36,6 +82,7 @@ string2  (\'[^"]*\')
 "&&"                  return '&&'
 "!"                   return '!'
 "="                   return '='
+":"                   return ':'
 
 "["                     return '['
 "]"                     return ']'
@@ -73,6 +120,10 @@ string2  (\'[^"]*\')
 "void"                  return "T_VOID"
 "graficar_ts"           return "GP_TS"
 
+/*array*/
+"push"                  return 'PUSH'
+"pop"                   return 'POP'
+
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		                return 'EOF'
 
@@ -91,12 +142,12 @@ string2  (\'[^"]*\')
 
 Startup
     : Instructions EOF{
-        return $1;
+        return formater($1);
     }
 ;
 
 Instructions
-    : instruction Instructions {$1.push($2);}
+    : Instructions instruction {$1.push($2); $$ = $1;}
     | instruction {$$=[$1];}
 ;
 
@@ -121,101 +172,122 @@ instruction
 ;
 
 statReturn
-    : RETURN genExpr ';'{}
-    | RETURN  ';' {}
+    : RETURN genExpr ';'    { $$ = sr([$1,$2,$3]);}
+    | RETURN varArray ';'   { $$ = sr([$1,$2,$3]); }
+    | RETURN  ';'           { $$ = sr([$1,$2]);}
 ;
 
 varDefinition
-    : LET ID '=' genExpr ';'{}
-    | CONST ID '=' genExpr ';'{}
-    | LET ID ';'{}
+    : LET ID '=' genExpr ';'    {$$ = sr([$1,$2,$3,$4,$5]);}
+    | CONST ID '=' genExpr ';'  {$$ = sr([$1,$2,$3,$4,$5]);}
+    | LET ID ';'                {$$ = sr([$1,$2,$3]);}
+    | LET ID '=' varArray ';'   { $$ = sr([$1,$2,$3,$4,$5]); }
+;
+
+
+varArray
+    : '[' paramsCall ']' { $$ = $1 + $2 + $3;}
+    | '[' ']' { $$ = $1 + $2; }
+;
+
+statArray
+    : ID '.' PUSH '(' genExpr ')' ';'   { $$ = sr([$1,$2,$3,$4,$5,$6,$7]); }
+    | ID '.' POP '(' genExpr ')' ';'    { $$ = sr([$1,$2,$3,$4,$5,$6,$7]); }
 ;
 
 varAsig
-    : ID '=' genExpr ';' {}
+    : ID '=' genExpr ';' {$$ = sr([$1,$2,$3,$4]);}
+    : ID '=' varArray ';' {$$ = sr([$1,$2,$3,$4]);}
 ;
 
 statGraph
-    : 'GP_TS' ';' { $$ = $1 + $2; }
+    : 'GP_TS' ';' { $$ = sr([$1,$2]); }
 ;
 statIf
-    : IF '(' genExpr ')' '{' Instructions '}' moreIf {$$ = $1+$2+$3+$4+$5+$6+$7+$8;}
+    : IF '(' genExpr ')' '{' Instructions '}' moreIf 
+    {
+        $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7+"\n",$8]);
+    }
 ;
 
 moreIf
-    : ELSE '{' Instructions '}' {$$=$1 + $2 + $4;}
-    | ELSE statIf {$$=$1 + $2;}
-    | /* empty */   {$$="";}
+    : ELSE '{' Instructions '}'     {$$=sr([$1,$2+"\n",$3,$4+"\n"]);}
+    | ELSE statIf                   {$$=sr([$1,$2]);}
+    | /* empty */                   {$$="";}
 ;
 
 statWhile 
-    : WHILE '(' genExpr ')' '{' Instructions '}' { $$ = $1+$2+$3+$4+$5+$6+$7; }
+    : WHILE '(' genExpr ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7]); }
 ;
 
 statDo
-    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { $$ = $1+$2+$3+$4+$5+$6+$7+$9; }
+    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { $$ = sr([$1,$2+"\n",$3,$4,$5,$6,$7,$8,$9+"\n"]); }
 ;
 
 statFor
-    : FOR '(' forVariant ')' '{' Instructions '}' { $$ = $1+$2+$3+$4+$5+$6+$7; }
+    : FOR '(' forVariant ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7+"\n"]); }
 ;
 
 forVariant
-    : VAR ID OF ID                      { $$ = $1+$2+$3+$4; }
-    | VAR ID IN ID                      { $$ = $1+$2+$3+$4; }
-    | varFor ';' genExpr ';' pasoFor    { $$ = $1+$2+$3+$4+$5; }
+    : VAR ID OF ID                      { $$ = sr([$1,$2,$3,$4]); }
+    | VAR ID IN ID                      { $$ = sr([$1,$2,$3,$4]); }
+    | varFor ';' genExpr ';' pasoFor    { $$ = sr([$1,$2,$3,$4,$5]); }
 ;
 
 pasoFor
-    : ID '+''+'';'
-    | ID '-''-'';'
-    | ID '=' genExpr
+    : ID '+''+'         { $$ = sr([$1,$2,$3]); }
+    | ID '-''-'         { $$ = sr([$1,$2,$3]); }
+    | ID '=' genExpr    { $$ = sr([$1,$2,$3]); }
 ;
 
 
 varFor
-    : LET ID '=' genExpr {}
-    | ID '=' genExpr { $$ = $1+$2+$3; }
+    : LET ID '=' genExpr    { $$ = sr([$1,$2,$3,$4]);}
+    | ID '=' genExpr        { $$ = sr([$1,$2,$3]); }
 ;
 
 unarOpr
-    : ID '+''+'';' { $$ = $1+$2+$3; }
-    | ID '-''+'';' { $$ = $1+$2+$3; }
+    : ID '+''+'';' { $$ = sr([$1,$2,$3,$4]); }
+    | ID '-''-'';' { $$ = sr([$1,$2,$3,$4]); }
 ;
 
 statSwitch
-    : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = $1+$2+$3+$4+$5+$6+$7;}
+    : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = sr([$1,$2,$3,$4,$5+"\n",formater($6),$7+"\n"]);}
 ;
 
+/*fix pusher*/
 swCases 
     : swCase swCases {$1.push($2);}
     | swCase {$$=[$1];}
 ;
 swCase
-    : CASE genExpr ':' '{' Instructions '}' { $$ = $1+$2+$3+$4+$5+$6; }
-    | DEFAULT '{' Instructions '}' {$$ = $1+$2+$3+$4;} 
+    : CASE genExpr ':' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4+"\n",$5,$6+"\n"]); }
+    | DEFAULT ':' '{' Instructions '}' { $$ = sr([$1,$2,$3+"\n",$4,$5+"\n"]); } 
 ;
 
 statBreak 
-    : BREAK ';' { $$ = $1 + $2; }
+    : BREAK ';' { $$ = sr([$1,$2]); }
 ;
 
 statContinue
-    : CONTINUE ';' { $$ = $1 + $2; }
+    : CONTINUE ';' { $$ = sr([$1,$2]); }
 ;
 
 /* here comes the magic */
 statFunc 
-    : FUNCTION '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  {$$ = $1+$2+$3+$4+$5+$6+$7+$8+$9;} 
+    : FUNCTION ID '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  {
+        $$ = sr([$1,$2,$3,$4,$5,$6,$7,$8+"\n",desanidar($9)[1],$10+"\n", desanidar($9)[0]]);
+        } 
 ;
 
 paramsFunc
-    : paramsFunc, tpf  { $$ = $1+$2; }
-    | tpf              { $$ = $1; }
+    : paramsFunc ',' tpf    { $$ = sr([$1,$2,$3]); }
+    | tpf                   { $$ = $1; }
+    | /* empty */           { $$ = " "; }
 ;
 
 tpf
-    : ID ':' typeReturn { $$ = $1 + $2 + $3; }
+    : ID ':' typeVar{ $$ = sr([$1,$2,$3]); }
 ;
 
 typeReturn
@@ -225,10 +297,15 @@ typeReturn
     | T_STRING  { $$ = $1; }
 ;
 
+typeVar
+    : T_NUMBER  { $$ = $1; }
+    | T_BOOLEAN { $$ = $1; }
+    | T_STRING  { $$ = $1; }
+;
 
 
 statConsole
-    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$ = $1 + $2; }
+    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$ = $1 + $2 + $3 + $4 + $5 +$6 + $7; }
 ;
 
 genExpr 
@@ -261,11 +338,11 @@ otro
 ;
 
 statCall 
-    : ID '(' ')' {}
-    | ID '(' paramsCall ')' {}
+    : ID '(' ')'            { $$ = $1 + $2 + $3; }
+    | ID '(' paramsCall ')' { $$ = $1 + $2 + $3 +$4; }
 ;
 
 paramsCall
-    : paramsCall ',' genExpr {}
-    | genExpr {}
+    : paramsCall ',' genExpr    { $$ = $1 + $2 + $3; }
+    | genExpr                   {$$=$1;}
 ;
