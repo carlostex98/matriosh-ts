@@ -3,13 +3,19 @@
     let rs = "";//donde habita el reporte
     let nodos = [];
     let relacion = [];
+    let nx = 0;
 
-    function nuevoNodo(){
-
+    function nuevoNodo(contenido){
+        nx++;
+        var tt = "nodo"+nx.toString()+'[ label=\"'+contenido+ '\"];' ;
+        nodos.push(tt);
+        return nx;
     }
 
     function creaRelaciones(padre, hijos){
-
+        for (i = 0; i < hijos.length; i++) {
+            relacion.push("nodo"+padre.toString()+" -> nodo"+hijos[i].toString());
+        }
     }
 
 %}
@@ -167,94 +173,156 @@ varAsig
 ;
 
 statGraph
-    : 'GP_TS' ';' { $$ = sr([$1,$2]); }
+    : 'GP_TS' ';' { $$ = nuevoNodo("SYMBOL"); }
 ;
 statIf
     : IF '(' genExpr ')' '{' Instructions '}' moreIf 
     {
-        $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7+"\n",$8]);
+        $$=nuevoNodo("IF"); 
+        let aux3=nx; 
+        creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
+        creaRelaciones(nx, $6);
+        creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
+        creaRelaciones(nx, [$3]);
+        creaRelaciones(aux3, [nuevoNodo("EXT")]);
+        creaRelaciones(nx, [$8]);
     }
 ;
 
 moreIf
-    : ELSE '{' Instructions '}'     {$$=sr([$1,$2+"\n",$3,$4+"\n"]);}
-    | ELSE statIf                   {$$=sr([$1,$2]);}
-    | /* empty */                   {$$="";}
+    : ELSE '{' Instructions '}'     {$$=nuevoNodo("ELSE"); creaRelaciones(nx, [nuevoNodo("INSTR")]); creaRelaciones(nx, $3);}
+    | ELSE statIf                   {$$=nuevoNodo("ELSE-IF"); creaRelaciones(nx, [$2]);}
+    | /* empty */                   {}
 ;
 
 statWhile 
-    : WHILE '(' genExpr ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7]); }
+    : WHILE '(' genExpr ')' '{' Instructions '}' 
+    {
+        $$=nuevoNodo("WHILE"); 
+        let aux3=nx; 
+        creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
+        creaRelaciones(nx, $6);
+        creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
+        creaRelaciones(nx, [$3]);
+    }
 ;
 
 statDo
-    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { $$ = sr([$1,$2+"\n",$3,$4,$5,$6,$7,$8,$9+"\n"]); }
+    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  
+    {
+        $$=nuevoNodo("DO WHILE"); 
+        let aux3=nx; 
+        creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
+        creaRelaciones(nx, $3);
+        creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
+        creaRelaciones(nx, [$7]);
+    }
 ;
 
 statFor
-    : FOR '(' forVariant ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7+"\n"]); }
+    : FOR '(' forVariant ')' '{' Instructions '}' 
+    { 
+        $$=nuevoNodo("FOR"); let aux3=nx; 
+        creaRelaciones(nx, [$3]);  
+        creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
+        creaRelaciones(nx, $6);
+    }
 ;
 
 forVariant
-    : VAR ID OF ID                      { $$ = sr([$1,$2,$3,$4]); }
-    | VAR ID IN ID                      { $$ = sr([$1,$2,$3,$4]); }
-    | varFor ';' genExpr ';' pasoFor    { $$ = sr([$1,$2,$3,$4,$5]); }
+    : VAR ID OF ID                      { $$ = nuevoNodo("STEP"); creaRelaciones(nx,[nuevoNodo($2), nuevoNodo("OF"), nuevoNodo($4)]);}
+    | VAR ID IN ID                      { $$ = nuevoNodo("STEP"); creaRelaciones(nx,[nuevoNodo($2), nuevoNodo("IN"), nuevoNodo($4)]); }
+    | varFor ';' genExpr ';' pasoFor    { $$ = nuevoNodo("LOGIC"); creaRelaciones(nx, [$1, $3, $5]);}
 ;
 
 pasoFor
-    : ID '+''+'         { $$ = sr([$1,$2,$3]); }
-    | ID '-''-'         { $$ = sr([$1,$2,$3]); }
-    | ID '=' genExpr    { $$ = sr([$1,$2,$3]); }
+    : ID '+''+'         { $$ = nuevoNodo("INCR: "+ $1); }
+    | ID '-''-'         { $$ = nuevoNodo("DECR: "+ $1);}
+    | ID '=' genExpr    { $$ = nuevoNodo("STEP"); creaRelaciones(nx, [$1, nuevoNodo("="), $3]); }
 ;
 
 
 varFor
-    : LET ID '=' genExpr    { $$ = sr([$1,$2,$3,$4]);}
-    | ID '=' genExpr        { $$ = sr([$1,$2,$3]); }
+    : LET ID '=' genExpr    { $$ = nuevoNodo("VAR"); creaRelaciones(nx, [$2, nuevoNodo("="), $4]);}
+    | ID '=' genExpr        { $$ = nuevoNodo("VAR"); creaRelaciones(nx, [$1, nuevoNodo("="), $3]); }
 ;
 
 unarOpr
-    : ID '+''+'';' { $$ = sr([$1,$2,$3,$4]); }
-    | ID '-''-'';' { $$ = sr([$1,$2,$3,$4]); }
+    : ID '+''+'';' { $$ = nuevoNodo("INCR: "+ $1); }
+    | ID '-''-'';' { $$ = nuevoNodo("DECR: "+ $1); }
 ;
 
 statSwitch
-    : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = sr([$1,$2,$3,$4,$5+"\n",formater($6),$7+"\n"]);}
+    : SWITCH '(' genExpr ')' '{' swCases '}'  
+    {
+        $$ = nuevoNodo("SWITCH");
+        let aux2 = nx;
+        creaRelaciones(nx, [nuevoNodo("VALOR")]); 
+        creaRelaciones(nx, [$3]);
+        creaRelaciones(aux2,nuevoNodo("CASES"));
+        creaRelaciones(nx, $5);
+    }
 ;
 
 /*fix pusher*/
 swCases 
-    : swCase swCases {$1.push($2);}
+    : swCase swCases {$1.push($2); $$=$1;}
     | swCase {$$=[$1];}
 ;
 
 swCase
-    : CASE genExpr ':' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4+"\n",$5,$6+"\n"]); }
-    | DEFAULT ':' '{' Instructions '}' { $$ = sr([$1,$2,$3+"\n",$4,$5+"\n"]); } 
+    : CASE genExpr ':' '{' Instructions '}' 
+    { 
+        $$ = nuevoNodo("CASE"); 
+        let aux2 = nx;
+        creaRelaciones(nx, [nuevoNodo("VALOR")]); 
+        creaRelaciones(nx, [$2]);
+        creaRelaciones(aux2,nuevoNodo("INSTR"));
+        creaRelaciones(nx, $5);
+    }
+    | DEFAULT ':' '{' Instructions '}' { $$ = nuevoNodo("DEFAULT"); creaRelaciones(nx, $4);} 
 ;
 
 statBreak 
-    : BREAK ';' { $$ = sr([$1,$2]); }
+    : BREAK ';' { $$ = nuevoNodo("BREAK"); }
 ;
 
 statContinue
-    : CONTINUE ';' { $$ = sr([$1,$2]); }
+    : CONTINUE ';' { $$ = nuevoNodo("CONTINUE"); }
 ;
 
 /* here comes the magic */
 statFunc 
-    : FUNCTION ID '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  {
-        $$ = sr([$1,$2,$3,$4,$5,$6,$7,$8+"\n",desanidar($9)[1],$10+"\n", desanidar($9)[0]]);
-        } 
+    : FUNCTION ID '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  
+        { 
+            $$=nuevoNodo("FUNC"); 
+            let aux1 = nx;
+            creaRelaciones(aux, [nuevoNodo("NOMB: "+$2) ]);
+            creaRelaciones(aux, [nuevoNodo("PARAMS") ]);
+            creaRelaciones(nx, $4);
+            creaRelaciones(aux, [nuevoNodo("RETURN": $7) ]);
+            creaRelaciones(aux, nuevoNodo("INSTR"));
+            creaRelaciones(nx, $9);
+            
+        }
+    | FUNCTION ID '('  ')' ':' typeReturn '{' Instructions '}'  
+        {
+            $$=nuevoNodo("FUNC"); 
+            let aux1 = nx;
+            creaRelaciones(aux, [nuevoNodo("NOMB: "+$2) ]);
+            creaRelaciones(aux, [nuevoNodo("RETURN": $6) ]);
+            creaRelaciones(aux, nuevoNodo("INSTR"));
+            creaRelaciones(nx, $8);
+        }  
 ;
 
 paramsFunc
-    : paramsFunc ',' tpf    { $$ = sr([$1,$2,$3]); }
-    | tpf                   { $$ = $1; }
-    | /* empty */           { $$ = " "; }
+    : paramsFunc ',' tpf    { $1.push($3); $$=$1;}
+    | tpf                   { $$ = [$1]; }
 ;
 
 tpf
-    : ID ':' typeVar{ $$ = sr([$1,$2,$3]); }
+    : ID ':' typeVar{ $$ = nuevoNodo("TYPE"); creaRelaciones(nx, [nuevoNodo($1), nuevoNodo($3)]); }
 ;
 
 typeReturn
@@ -272,44 +340,43 @@ typeVar
 
 
 statConsole
-    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$ = $1 + $2 + $3 + $4 + $5 +$6 + $7; }
+    : CONSOLE '.' LOG '(' genExpr ')' ';' { $$=nuevoNodo("PRINT"); creaRelaciones(nx, [$5]);}
 ;
 
 genExpr 
-    : genExpr '+' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '-' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '*' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '/' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '^' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '<' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '>' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '<=' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '>=' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '==' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '!=' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '&&' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '%' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '||' genExpr { $$ = $1 + $2 + $3; }
-    | otro { $$ = $1; }
+    : genExpr '+' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '-' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '*' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '/' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '^' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '<' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '>' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '<=' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '>=' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '==' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '!=' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '&&' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '%' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '||' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | otro                  { $$ = $1; }
 ;
 
 otro
-    : '(' genExpr ')'   { $$ = $1 + $2 + $3; }
-    | NUMBER            { $$ = $1; }
-    | DECIMAL           { $$ = $1; }
-    | STRING            { $$ = $1; }
-    | ID                { $$ = $1; }
-    | '-' genExpr       { $$ = $1 + $2; }
-    | '!' genExpr       { $$ = $1 + $2; }
-    | statCall          { $$ = $1; }
+    : '(' genExpr ')'   { $$ = nuevoNodo("PAR"); creaRelaciones(nx,[nuevoNodo("("),$2],nuevoNodo(')')); }
+    | NUMBER            { $$ = nuevoNodo($1+" (val)"); }
+    | DECIMAL           { $$ = nuevoNodo($1+" (val)"); }
+    | STRING            { $$ = nuevoNodo($1+" (val)");}
+    | ID                { $$ = nuevoNodo($1+" (ID)"); }
+    | '!' genExpr       { $$ = nuevoNodo("NOT"); creaRelaciones(nx,[$2]);}
+    | statCall          { $$ = nuevoNodo("CALL"); creaRelaciones(nx,[$1]); }
 ;
 
 statCall 
-    : ID '(' ')'            { $$ = $1 + $2 + $3; }
-    | ID '(' paramsCall ')' { $$ = $1 + $2 + $3 +$4; }
+    : ID '(' ')'            { $$ = nuevoNodo($1); }
+    | ID '(' paramsCall ')' { $$ = [nuevoNodo($1), nuevoNodo("PARAMS")]; creaRelaciones(nx, $3)}
 ;
 
 paramsCall
-    : paramsCall ',' genExpr    { $$ = $1 + $2 + $3; }
-    | genExpr                   {$$=$1;}
+    : paramsCall ',' genExpr    { $1.push($3); $$=$1;}
+    | genExpr                   {$$=[$1];}
 ;
