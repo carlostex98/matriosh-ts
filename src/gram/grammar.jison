@@ -51,31 +51,31 @@
 %lex
 %options case-insensitive
 number  [0-9]+
-decimal {entero}"."{entero}
+decimal {number}[.]{number}
 string  (\"[^"]*\")
 string2  (\'[^"]*\')
 %%
 \s+                   /* skip whitespace */
 [/][/].*                                {}  //una linea
 [/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]	    {} //multilinea
-{number}                return 'NUMBER'
 {decimal}               return 'DECIMAL'
+{number}                return 'NUMBER'
 {string}                return 'STRING'
 {string2}               return 'STRING'
+"**"                     return '**'
 "*"                     return '*'
 "/"                     return '/'
 ";"                     return ';'
 ","                     return ','
 "-"                     return '-'
 "+"                     return '+'
-"^"                     return '^'
 "."                     return '.'
 "%"                     return '%'
 
-"<"                   return '<'
-">"                   return '>'
 "<="                  return '<='
 ">="                  return '>='
+"<"                   return '<'
+">"                   return '>'
 "=="                  return '=='
 "!="                  return '!='
 "||"                  return '||'
@@ -169,6 +169,8 @@ instruction
     | varDefinition    { $$ = $1; }
     | statReturn       { $$ = $1; }
     | varAsig          { $$ = $1; }
+    | statArray        { $$ = $1; }
+    | unarOpr          { $$ = $1; }
 ;
 
 statReturn
@@ -182,6 +184,7 @@ varDefinition
     | CONST ID '=' genExpr ';'  {$$ = sr([$1,$2,$3,$4,$5]);}
     | LET ID ';'                {$$ = sr([$1,$2,$3]);}
     | LET ID '=' varArray ';'   { $$ = sr([$1,$2,$3,$4,$5]); }
+    | LET ID ':' typeVar '=' genExpr  ';'{$$ = sr([$1,$2,$3,$4,$5,$6,$7]);}
 ;
 
 
@@ -191,13 +194,13 @@ varArray
 ;
 
 statArray
-    : ID '.' PUSH '(' genExpr ')' ';'   { $$ = sr([$1,$2,$3,$4,$5,$6,$7]); }
-    | ID '.' POP '(' genExpr ')' ';'    { $$ = sr([$1,$2,$3,$4,$5,$6,$7]); }
+    : ID '.' PUSH '(' genExpr ')' ';'   { $$ = $1+$2+$3+$4+$5+$6+$7; }
+    | ID '.' POP '(' genExpr ')' ';'    { $$ = $1+$2+$3+$4+$5+$6+$7; }
 ;
 
 varAsig
     : ID '=' genExpr ';' {$$ = sr([$1,$2,$3,$4]);}
-    : ID '=' varArray ';' {$$ = sr([$1,$2,$3,$4]);}
+    | ID '=' varArray ';' {$$ = sr([$1,$2,$3,$4]);}
 ;
 
 statGraph
@@ -206,26 +209,26 @@ statGraph
 statIf
     : IF '(' genExpr ')' '{' Instructions '}' moreIf 
     {
-        $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7+"\n",$8]);
+        $$ = sr([$1,$2,$3,$4,$5+"\n", formater($6),$7+"\n",$8]);
     }
 ;
 
 moreIf
-    : ELSE '{' Instructions '}'     {$$=sr([$1,$2+"\n",$3,$4+"\n"]);}
+    : ELSE '{' Instructions '}'     {$$=sr([$1,$2+"\n",formater($3),$4+"\n"]);}
     | ELSE statIf                   {$$=sr([$1,$2]);}
     | /* empty */                   {$$="";}
 ;
 
 statWhile 
-    : WHILE '(' genExpr ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7]); }
+    : WHILE '(' genExpr ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",formater($6),$7]); }
 ;
 
 statDo
-    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { $$ = sr([$1,$2+"\n",$3,$4,$5,$6,$7,$8,$9+"\n"]); }
+    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { $$ = sr([$1,$2+"\n",formater($3),$4,$5,$6,$7,$8,$9+"\n"]); }
 ;
 
 statFor
-    : FOR '(' forVariant ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",$6,$7+"\n"]); }
+    : FOR '(' forVariant ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",formater($6),$7+"\n"]); }
 ;
 
 forVariant
@@ -247,8 +250,8 @@ varFor
 ;
 
 unarOpr
-    : ID '+''+'';' { $$ = sr([$1,$2,$3,$4]); }
-    | ID '-''-'';' { $$ = sr([$1,$2,$3,$4]); }
+    : ID '+''+'';' { $$ = $1+$2+$3+$4; }
+    | ID '-''-'';' { $$ = $1+$2+$3+$4; }
 ;
 
 statSwitch
@@ -257,13 +260,13 @@ statSwitch
 
 /*fix pusher*/
 swCases 
-    : swCase swCases {$1.push($2);}
+    : swCases swCase {$1.push($2); $$=$1;}
     | swCase {$$=[$1];}
 ;
 
 swCase
-    : CASE genExpr ':' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4+"\n",$5,$6+"\n"]); }
-    | DEFAULT ':' '{' Instructions '}' { $$ = sr([$1,$2,$3+"\n",$4,$5+"\n"]); } 
+    : CASE genExpr ':'  Instructions  { $$ = sr([$1,$2,$3+"\n",formater($4)+"\n"]); }
+    | DEFAULT ':'  Instructions  { $$ = sr([$1,$2+"\n",formater($3)+"\n"]); } 
 ;
 
 statBreak 
@@ -276,9 +279,15 @@ statContinue
 
 /* here comes the magic */
 statFunc 
-    : FUNCTION ID '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  {
+    : FUNCTION ID '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  
+    {
         $$ = sr([$1,$2,$3,$4,$5,$6,$7,$8+"\n",desanidar($9)[1],$10+"\n", desanidar($9)[0]]);
-        } 
+    } 
+
+    | FUNCTION ID '(' paramsFunc ')'  '{' Instructions '}'  
+    {
+        $$ = sr([$1,$2,$3,$4,$5,$6+"\n",desanidar($7)[1],$8+"\n", desanidar($7)[0]]);
+    }
 ;
 
 paramsFunc
@@ -312,13 +321,13 @@ statConsole
 genExpr 
     : genExpr '+' genExpr { $$ = $1 + $2 + $3; }
     | genExpr '-' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '**' genExpr { $$ = $1 + $2 + $3; }
     | genExpr '*' genExpr { $$ = $1 + $2 + $3; }
     | genExpr '/' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '^' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '<' genExpr { $$ = $1 + $2 + $3; }
-    | genExpr '>' genExpr { $$ = $1 + $2 + $3; }
     | genExpr '<=' genExpr { $$ = $1 + $2 + $3; }
     | genExpr '>=' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '<' genExpr { $$ = $1 + $2 + $3; }
+    | genExpr '>' genExpr { $$ = $1 + $2 + $3; }
     | genExpr '==' genExpr { $$ = $1 + $2 + $3; }
     | genExpr '!=' genExpr { $$ = $1 + $2 + $3; }
     | genExpr '&&' genExpr { $$ = $1 + $2 + $3; }
@@ -335,12 +344,16 @@ otro
     | ID                { $$ = $1; }
     | '-' genExpr       { $$ = $1 + $2; }
     | '!' genExpr       { $$ = $1 + $2; }
-    | statCall          { $$ = $1; }
+    | statCall2          { $$ = $1; }
 ;
 
+statCall2
+    : ID '(' ')'           { $$ = $1 + $2 + $3 ; }
+    | ID '(' paramsCall ')'  { $$ = $1 + $2 + $3 +$4 ; }
+;
 statCall 
-    : ID '(' ')'            { $$ = $1 + $2 + $3; }
-    | ID '(' paramsCall ')' { $$ = $1 + $2 + $3 +$4; }
+    : ID '(' ')' ';'           { $$ = $1 + $2 + $3 + $4; }
+    | ID '(' paramsCall ')' ';' { $$ = $1 + $2 + $3 +$4 + $5; }
 ;
 
 paramsCall
