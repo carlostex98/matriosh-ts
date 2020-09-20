@@ -16,10 +16,16 @@ exports.App = void 0;
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const Environment_1 = require("./Symbol/Environment");
+const Errores_1 = require("./Errores");
+const err_1 = require("./err");
+const Function_1 = require("./Instruction/Function");
 class App {
     constructor() {
         this.traduced = "";
         this.parser = require('./gram/grammar');
+        this.gst = require("./ast/ast");
+        this.intr = require("./Interpreter/interpreter");
         this.app = express_1.default();
         this.settings();
         this.routes();
@@ -35,8 +41,36 @@ class App {
             res.render('traduced.ejs', m);
         });
         this.app.post('/', (req, res) => {
-            let p = this.parser.parse(req.body.codigo);
-            this.traduced = p;
+            //let n = this.gst.parser.parse(req.body.codigo);
+            //let p = this.parser.parse(req.body.codigo);
+            this.traduced = "ver consola";
+            const ast = this.intr.parse(req.body.codigo);
+            const env = new Environment_1.Environment(null);
+            for (const instr of ast) {
+                try {
+                    if (instr instanceof Function_1.Function)
+                        instr.execute(env);
+                }
+                catch (error) {
+                    Errores_1.errores.push(error);
+                }
+            }
+            for (const instr of ast) {
+                if (instr instanceof Function_1.Function)
+                    continue;
+                try {
+                    const actual = instr.execute(env);
+                    if (actual != null || actual != undefined) {
+                        Errores_1.errores.push(new err_1.Err(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
+                    }
+                }
+                catch (error) {
+                    Errores_1.errores.push(error);
+                }
+            }
+            for (let index = 0; index < Errores_1.errores.length; index++) {
+                console.log(Errores_1.errores[index]);
+            }
             res.redirect('/traduced');
         });
     }
