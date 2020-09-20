@@ -3,10 +3,24 @@ import path from "path";
 import bodyParser from "body-parser";
 import ejs from 'ejs';
 
+
+import { Instruction } from "./Abstract/Instruction";
+import { Environment } from "./Symbol/Environment";
+import { errores } from './Errores';
+import { Err } from "./err";
+import { Function } from "./Instruction/Function";
+
+
+
+
+
+
 export class App {
     private app: Application;
     private traduced: String = "";
     public parser = require('./gram/grammar');
+    public gst = require("./ast/ast");
+    public intr = require("./Interpreter/interpreter");
 
     constructor() {
         this.app = express();
@@ -27,8 +41,37 @@ export class App {
         });
 
         this.app.post('/', (req, res) => {
-            let p = this.parser.parse(req.body.codigo);
-            this.traduced = p;
+            //let n = this.gst.parser.parse(req.body.codigo);
+            //let p = this.parser.parse(req.body.codigo);
+            this.traduced = "ver consola";
+            const ast = this.intr.parse(req.body.codigo);
+            const env = new Environment(null);
+            for(const instr of ast){
+                try {
+                    if(instr instanceof Function)
+                        instr.execute(env);
+                } catch (error) {
+                    errores.push(error);  
+                }
+            }
+
+            for(const instr of ast){
+                if(instr instanceof Function)
+                    continue;
+                try {
+                    const actual = instr.execute(env);
+                    if(actual != null || actual != undefined){
+                        errores.push(new Err(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
+                    }
+                } catch (error) {
+                    errores.push(error);  
+                }
+            }
+
+            for (let index = 0; index < errores.length; index++) {
+                console.log(errores[index]);
+            }
+            
             res.redirect('/traduced');
         });
 

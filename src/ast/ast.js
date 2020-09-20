@@ -133,7 +133,7 @@ break;
 case 35:
 
         this.$=nuevoNodo("IF"); 
-        let aux3=nx; 
+        aux3=nx; 
         creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
         creaRelaciones(nx, $$[$0-2]);
         creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
@@ -151,7 +151,7 @@ break;
 case 39:
 
         this.$=nuevoNodo("WHILE"); 
-        let aux3=nx; 
+        aux3=nx; 
         creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
         creaRelaciones(nx, $$[$0-1]);
         creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
@@ -161,7 +161,7 @@ break;
 case 40:
 
         this.$=nuevoNodo("DO WHILE"); 
-        let aux3=nx; 
+        aux3=nx; 
         creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
         creaRelaciones(nx, $$[$0-6]);
         creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
@@ -170,7 +170,7 @@ case 40:
 break;
 case 41:
  
-        this.$=nuevoNodo("FOR"); let aux3=nx; 
+        this.$=nuevoNodo("FOR"); aux3=nx; 
         creaRelaciones(nx, [$$[$0-4]]);  
         creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
         creaRelaciones(nx, $$[$0-1]);
@@ -209,7 +209,7 @@ break;
 case 52:
 
         this.$ = nuevoNodo("SWITCH");
-        let aux2 = nx;
+        aux2 = nx;
         creaRelaciones(nx, [nuevoNodo("VALOR")]); 
         creaRelaciones(nx, [$$[$0-4]]);
         creaRelaciones(aux2,nuevoNodo("CASES"));
@@ -222,7 +222,7 @@ break;
 case 55:
  
         this.$ = nuevoNodo("CASE"); 
-        let aux2 = nx;
+        aux2 = nx;
         creaRelaciones(nx, [nuevoNodo("VALOR")]); 
         creaRelaciones(nx, [$$[$0-4]]);
         creaRelaciones(aux2,nuevoNodo("INSTR"));
@@ -242,11 +242,11 @@ case 59:
  
             this.$=nuevoNodo("FUNC"); 
             let aux1 = nx;
-            creaRelaciones(aux, [nuevoNodo("NOMB: "+$$[$0-8]) ]);
-            creaRelaciones(aux, [nuevoNodo("PARAMS") ]);
+            creaRelaciones(aux1, [nuevoNodo("NOMB: "+$$[$0-8]) ]);
+            creaRelaciones(aux1, [nuevoNodo("PARAMS") ]);
             creaRelaciones(nx, $$[$0-6]);
-            creaRelaciones(aux, [nuevoNodo("RETURN": $$[$0-3]) ]);
-            creaRelaciones(aux, nuevoNodo("INSTR"));
+            creaRelaciones(aux1, [nuevoNodo("RETURN: "+ $$[$0-3]) ]);
+            creaRelaciones(aux1, nuevoNodo("INSTR"));
             creaRelaciones(nx, $$[$0-1]);
             
         
@@ -254,10 +254,10 @@ break;
 case 60:
 
             this.$=nuevoNodo("FUNC"); 
-            let aux1 = nx;
-            creaRelaciones(aux, [nuevoNodo("NOMB: "+$$[$0-7]) ]);
-            creaRelaciones(aux, [nuevoNodo("RETURN": $$[$0-3]) ]);
-            creaRelaciones(aux, nuevoNodo("INSTR"));
+            aux1 = nx;
+            creaRelaciones(aux1, [nuevoNodo("NOMB: "+$$[$0-7]) ]);
+            creaRelaciones(aux1, [nuevoNodo("RETURN: "+ $$[$0-3]) ]);
+            creaRelaciones(aux1, nuevoNodo("INSTR"));
             creaRelaciones(nx, $$[$0-1]);
         
 break;
@@ -455,7 +455,9 @@ parse: function parse(input) {
     let nodos = [];
     let relacion = [];
     let nx = 0;
-
+    let aux1 = 0;
+    let aux2 = 0;
+    let aux3 = 0;
     function nuevoNodo(contenido){
         nx++;
         var tt = "nodo"+nx.toString()+'[ label=\"'+contenido+ '\"]; \n' ;

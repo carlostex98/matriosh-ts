@@ -3,7 +3,9 @@
     let nodos = [];
     let relacion = [];
     let nx = 0;
-
+    let aux1 = 0;
+    let aux2 = 0;
+    let aux3 = 0;
     function nuevoNodo(contenido){
         nx++;
         var tt = "nodo"+nx.toString()+'[ label=\"'+contenido+ '\"]; \n' ;
@@ -30,6 +32,7 @@
         rs+= "}";
         nodos = [];
         relacion = [];
+        nx=0;
         return rs;
     }
 
@@ -194,7 +197,7 @@ statIf
     : IF '(' genExpr ')' '{' Instructions '}' moreIf 
     {
         $$=nuevoNodo("IF"); 
-        let aux3=nx; 
+        aux3=nx; 
         creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
         creaRelaciones(nx, $6);
         creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
@@ -214,7 +217,7 @@ statWhile
     : WHILE '(' genExpr ')' '{' Instructions '}' 
     {
         $$=nuevoNodo("WHILE"); 
-        let aux3=nx; 
+        aux3=nx; 
         creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
         creaRelaciones(nx, $6);
         creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
@@ -226,7 +229,7 @@ statDo
     : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  
     {
         $$=nuevoNodo("DO WHILE"); 
-        let aux3=nx; 
+        aux3=nx; 
         creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
         creaRelaciones(nx, $3);
         creaRelaciones(aux3, [nuevoNodo("LOGIC")]);
@@ -237,7 +240,7 @@ statDo
 statFor
     : FOR '(' forVariant ')' '{' Instructions '}' 
     { 
-        $$=nuevoNodo("FOR"); let aux3=nx; 
+        $$=nuevoNodo("FOR"); aux3=nx; 
         creaRelaciones(nx, [$3]);  
         creaRelaciones(aux3, [nuevoNodo("INSTR")]); 
         creaRelaciones(nx, $6);
@@ -271,7 +274,7 @@ statSwitch
     : SWITCH '(' genExpr ')' '{' swCases '}'  
     {
         $$ = nuevoNodo("SWITCH");
-        let aux2 = nx;
+        aux2 = nx;
         creaRelaciones(nx, [nuevoNodo("VALOR")]); 
         creaRelaciones(nx, [$3]);
         creaRelaciones(aux2,nuevoNodo("CASES"));
@@ -289,7 +292,7 @@ swCase
     : CASE genExpr ':' '{' Instructions '}' 
     { 
         $$ = nuevoNodo("CASE"); 
-        let aux2 = nx;
+        aux2 = nx;
         creaRelaciones(nx, [nuevoNodo("VALOR")]); 
         creaRelaciones(nx, [$2]);
         creaRelaciones(aux2,nuevoNodo("INSTR"));
@@ -312,21 +315,21 @@ statFunc
         { 
             $$=nuevoNodo("FUNC"); 
             let aux1 = nx;
-            creaRelaciones(aux, [nuevoNodo("NOMB: "+$2) ]);
-            creaRelaciones(aux, [nuevoNodo("PARAMS") ]);
+            creaRelaciones(aux1, [nuevoNodo("NOMB: "+$2) ]);
+            creaRelaciones(aux1, [nuevoNodo("PARAMS") ]);
             creaRelaciones(nx, $4);
-            creaRelaciones(aux, [nuevoNodo("RETURN": $7) ]);
-            creaRelaciones(aux, nuevoNodo("INSTR"));
+            creaRelaciones(aux1, [nuevoNodo("RETURN: "+ $7) ]);
+            creaRelaciones(aux1, nuevoNodo("INSTR"));
             creaRelaciones(nx, $9);
             
         }
     | FUNCTION ID '('  ')' ':' typeReturn '{' Instructions '}'  
         {
             $$=nuevoNodo("FUNC"); 
-            let aux1 = nx;
-            creaRelaciones(aux, [nuevoNodo("NOMB: "+$2) ]);
-            creaRelaciones(aux, [nuevoNodo("RETURN": $6) ]);
-            creaRelaciones(aux, nuevoNodo("INSTR"));
+            aux1 = nx;
+            creaRelaciones(aux1, [nuevoNodo("NOMB: "+$2) ]);
+            creaRelaciones(aux1, [nuevoNodo("RETURN: "+ $6) ]);
+            creaRelaciones(aux1, nuevoNodo("INSTR"));
             creaRelaciones(nx, $8);
         }  
 ;
