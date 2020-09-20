@@ -5,14 +5,14 @@ import { Type } from "../Abstract/ret_v";
 
 export class For extends Instruction{
 
-    constructor(private vars: Instruction, private condition : Expression, private incr: Instruction,private code : Instruction, line : number, column : number){
+    constructor(private vars: Instruction, private cnd : Expression, private incr: Instruction,private code : Instruction, line : number, column : number){
         super(line, column);
     }
 
     public execute(env : Environment) {
         
         this.vars.execute(env);
-        let condition = this.condition.execute(env);
+        let condition = this.cnd.execute(env);
         if(condition.type != Type.BOOLEAN){
             throw {error: "Not boolean expression", linea: this.line, columna : this.column};
         }
@@ -23,11 +23,13 @@ export class For extends Instruction{
             if(element != null || element != undefined){
                 console.log(element);
                 if(element.type == 'Break')
+                    //suporting break
                     break;
                 else if(element.type == 'Continue')
+                    //suporting continue
                     continue;
             }
-            condition = this.condition.execute(env);
+            condition = this.cnd.execute(env);
             if(condition.type != Type.BOOLEAN){
                 throw {error: "Not boolean expression", linea: this.line, columna : this.column};
             }
