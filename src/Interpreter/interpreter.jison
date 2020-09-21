@@ -95,9 +95,6 @@ string2  (\'[^"]*\')
 "void"                  return "T_VOID"
 "graficar_ts"           return "GP_TS"
 
-/*array*/
-"push"                  return 'PUSH'
-"pop"                   return 'POP'
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		                return 'EOF'

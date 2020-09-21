@@ -120,15 +120,13 @@ string2  (\'[^"]*\')
 "void"                  return "T_VOID"
 "graficar_ts"           return "GP_TS"
 
-/*array*/
-"push"                  return 'PUSH'
-"pop"                   return 'POP'
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		                return 'EOF'
 
 /lex
 
+%left '!'
 %left '||'
 %left '&&'
 %left '==', '!='
@@ -162,45 +160,30 @@ instruction
     | statConsole      { $$ = $1; }
     | statFunc         { $$ = $1; }
     | statGraph        { $$ = $1; }
-    | statCreateVar    { $$ = $1; }
     | statConsole      { $$ = $1; }
     | statCall         { $$ = $1; }
     | statIncremento   { $$ = $1; }
     | varDefinition    { $$ = $1; }
     | statReturn       { $$ = $1; }
     | varAsig          { $$ = $1; }
-    | statArray        { $$ = $1; }
     | unarOpr          { $$ = $1; }
 ;
 
 statReturn
-    : RETURN genExpr ';'    { $$ = sr([$1,$2,$3]);}
-    | RETURN varArray ';'   { $$ = sr([$1,$2,$3]); }
-    | RETURN  ';'           { $$ = sr([$1,$2]);}
+    : RETURN genExpr ';'    { $$ = sr([$1,$2,$3])+"\n";}
+    | RETURN  ';'           { $$ = sr([$1,$2])+"\n";}
 ;
 
 varDefinition
     : LET ID '=' genExpr ';'    {$$ = sr([$1,$2,$3,$4,$5]);}
     | CONST ID '=' genExpr ';'  {$$ = sr([$1,$2,$3,$4,$5]);}
     | LET ID ';'                {$$ = sr([$1,$2,$3]);}
-    | LET ID '=' varArray ';'   { $$ = sr([$1,$2,$3,$4,$5]); }
     | LET ID ':' typeVar '=' genExpr  ';'{$$ = sr([$1,$2,$3,$4,$5,$6,$7]);}
 ;
 
 
-varArray
-    : '[' paramsCall ']' { $$ = $1 + $2 + $3;}
-    | '[' ']' { $$ = $1 + $2; }
-;
-
-statArray
-    : ID '.' PUSH '(' genExpr ')' ';'   { $$ = $1+$2+$3+$4+$5+$6+$7; }
-    | ID '.' POP '(' genExpr ')' ';'    { $$ = $1+$2+$3+$4+$5+$6+$7; }
-;
-
 varAsig
     : ID '=' genExpr ';' {$$ = sr([$1,$2,$3,$4]);}
-    | ID '=' varArray ';' {$$ = sr([$1,$2,$3,$4]);}
 ;
 
 statGraph
@@ -209,22 +192,22 @@ statGraph
 statIf
     : IF '(' genExpr ')' '{' Instructions '}' moreIf 
     {
-        $$ = sr([$1,$2,$3,$4,$5+"\n", formater($6),$7+"\n",$8]);
+        $$ = sr([$1,$2,$3,$4,$5+"\n", formater($6)+"\n",$7+"\n",$8]);
     }
 ;
 
 moreIf
-    : ELSE '{' Instructions '}'     {$$=sr([$1,$2+"\n",formater($3),$4+"\n"]);}
+    : ELSE '{' Instructions '}'     {$$=sr([$1,$2+"\n",formater($3)+"\n",$4+"\n"]);}
     | ELSE statIf                   {$$=sr([$1,$2]);}
     | /* empty */                   {$$="";}
 ;
 
 statWhile 
-    : WHILE '(' genExpr ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",formater($6),$7]); }
+    : WHILE '(' genExpr ')' '{' Instructions '}' { $$ = sr([$1,$2,$3,$4,$5+"\n",formater($6)+"\n",$7]); }
 ;
 
 statDo
-    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { $$ = sr([$1,$2+"\n",formater($3),$4,$5,$6,$7,$8,$9+"\n"]); }
+    : DO '{' Instructions '}' WHILE '(' genExpr ')' ';'  { $$ = sr([$1,$2+"\n",formater($3)+"\n",$4,$5,$6,$7,$8,$9+"\n"]); }
 ;
 
 statFor
@@ -232,9 +215,7 @@ statFor
 ;
 
 forVariant
-    : VAR ID OF ID                      { $$ = sr([$1,$2,$3,$4]); }
-    | VAR ID IN ID                      { $$ = sr([$1,$2,$3,$4]); }
-    | varFor ';' genExpr ';' pasoFor    { $$ = sr([$1,$2,$3,$4,$5]); }
+    : varFor ';' genExpr ';' pasoFor    { $$ = sr([$1,$2,$3,$4,$5]); }
 ;
 
 pasoFor
@@ -255,7 +236,7 @@ unarOpr
 ;
 
 statSwitch
-    : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = sr([$1,$2,$3,$4,$5+"\n",formater($6),$7+"\n"]);}
+    : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = sr([$1,$2,$3,$4,$5+"\n",formater($6)+"\n",$7+"\n"]);}
 ;
 
 /*fix pusher*/
@@ -279,12 +260,7 @@ statContinue
 
 /* here comes the magic */
 statFunc 
-    : FUNCTION ID '(' paramsFunc ')' ':' typeReturn '{' Instructions '}'  
-    {
-        $$ = sr([$1,$2,$3,$4,$5,$6,$7,$8+"\n",desanidar($9)[1],$10+"\n", desanidar($9)[0]]);
-    } 
-
-    | FUNCTION ID '(' paramsFunc ')'  '{' Instructions '}'  
+    : FUNCTION ID '(' paramsFunc ')'  '{' Instructions '}'  
     {
         $$ = sr([$1,$2,$3,$4,$5,$6+"\n",desanidar($7)[1],$8+"\n", desanidar($7)[0]]);
     }

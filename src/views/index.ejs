@@ -30,7 +30,14 @@
                 <textarea class="form-control" id="codigo" name="codigo" rows="20"></textarea>
             </div>
             <br>
-            <button class="btn btn-primary btn-lg" type="submit">Ejecutar</button> 
+            <div class="form-group">
+                <label >Seleciona la accion</label>
+                <select multiple class="form-control" id="opt" name = "opt">
+                  <option value="1" selected>Traducir</option>
+                  <option value="2" >Traducir e interpretar</option>
+                </select>
+              </div>
+            <button class="btn btn-primary btn-lg" type="submit">Ejecutar accion</button> 
         </form>
         
     </div>

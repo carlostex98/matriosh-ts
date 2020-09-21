@@ -18,6 +18,8 @@ import { Function } from "./Instruction/Function";
 export class App {
     private app: Application;
     private traduced: String = "";
+    private console_out: String = "";
+
     public parser = require('./gram/grammar');
     public gst = require("./ast/ast");
     public intr = require("./Interpreter/interpreter");
@@ -40,37 +42,21 @@ export class App {
             res.render('traduced.ejs', m);
         });
 
+        this.app.get('/compiled', (req, res) => {
+            var m = {
+                trd: this.traduced
+
+            }
+            res.render('traduced.ejs', m);
+        });
+
+        
+
         this.app.post('/', (req, res) => {
             //let n = this.gst.parser.parse(req.body.codigo);
-            //let p = this.parser.parse(req.body.codigo);
-            this.traduced = "ver consola";
-            const ast = this.intr.parse(req.body.codigo);
-            const env = new Environment(null);
-            for(const instr of ast){
-                try {
-                    if(instr instanceof Function)
-                        instr.execute(env);
-                } catch (error) {
-                    errores.push(error);  
-                }
-            }
-
-            for(const instr of ast){
-                if(instr instanceof Function)
-                    continue;
-                try {
-                    const actual = instr.execute(env);
-                    if(actual != null || actual != undefined){
-                        errores.push(new Err(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
-                    }
-                } catch (error) {
-                    errores.push(error);  
-                }
-            }
-
-            for (let index = 0; index < errores.length; index++) {
-                console.log(errores[index]);
-            }
+            let p = this.parser.parse(req.body.codigo);
+            this.traduced = p;
+            console.log(req.body.opt);
             
             res.redirect('/traduced');
         });
@@ -81,6 +67,36 @@ export class App {
         this.app.set("views", path.join(__dirname, "views"));
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
+    }
+
+    public interpreter(codigo: string){
+        const ast = this.intr.parse(codigo);
+        const env = new Environment(null);
+        for(const instr of ast){
+            try {
+                if(instr instanceof Function)
+                    instr.execute(env);
+            } catch (error) {
+                errores.push(error);  
+            }
+        }
+
+        for(const instr of ast){
+            if(instr instanceof Function)
+                continue;
+            try {
+                const actual = instr.execute(env);
+                if(actual != null || actual != undefined){
+                    errores.push(new Err(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
+                }
+            } catch (error) {
+                errores.push(error);  
+            }
+        }
+
+        for (let index = 0; index < errores.length; index++) {
+            console.log(errores[index]);
+        }
     }
 
 

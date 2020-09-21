@@ -23,6 +23,7 @@ const Function_1 = require("./Instruction/Function");
 class App {
     constructor() {
         this.traduced = "";
+        this.console_out = "";
         this.parser = require('./gram/grammar');
         this.gst = require("./ast/ast");
         this.intr = require("./Interpreter/interpreter");
@@ -40,37 +41,17 @@ class App {
             };
             res.render('traduced.ejs', m);
         });
+        this.app.get('/compiled', (req, res) => {
+            var m = {
+                trd: this.traduced
+            };
+            res.render('traduced.ejs', m);
+        });
         this.app.post('/', (req, res) => {
             //let n = this.gst.parser.parse(req.body.codigo);
-            //let p = this.parser.parse(req.body.codigo);
-            this.traduced = "ver consola";
-            const ast = this.intr.parse(req.body.codigo);
-            const env = new Environment_1.Environment(null);
-            for (const instr of ast) {
-                try {
-                    if (instr instanceof Function_1.Function)
-                        instr.execute(env);
-                }
-                catch (error) {
-                    Errores_1.errores.push(error);
-                }
-            }
-            for (const instr of ast) {
-                if (instr instanceof Function_1.Function)
-                    continue;
-                try {
-                    const actual = instr.execute(env);
-                    if (actual != null || actual != undefined) {
-                        Errores_1.errores.push(new err_1.Err(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
-                    }
-                }
-                catch (error) {
-                    Errores_1.errores.push(error);
-                }
-            }
-            for (let index = 0; index < Errores_1.errores.length; index++) {
-                console.log(Errores_1.errores[index]);
-            }
+            let p = this.parser.parse(req.body.codigo);
+            this.traduced = p;
+            console.log(req.body.opt);
             res.redirect('/traduced');
         });
     }
@@ -79,6 +60,35 @@ class App {
         this.app.set("views", path_1.default.join(__dirname, "views"));
         this.app.use(body_parser_1.default.json());
         this.app.use(body_parser_1.default.urlencoded({ extended: true }));
+    }
+    interpreter(codigo) {
+        const ast = this.intr.parse(codigo);
+        const env = new Environment_1.Environment(null);
+        for (const instr of ast) {
+            try {
+                if (instr instanceof Function_1.Function)
+                    instr.execute(env);
+            }
+            catch (error) {
+                Errores_1.errores.push(error);
+            }
+        }
+        for (const instr of ast) {
+            if (instr instanceof Function_1.Function)
+                continue;
+            try {
+                const actual = instr.execute(env);
+                if (actual != null || actual != undefined) {
+                    Errores_1.errores.push(new err_1.Err(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
+                }
+            }
+            catch (error) {
+                Errores_1.errores.push(error);
+            }
+        }
+        for (let index = 0; index < Errores_1.errores.length; index++) {
+            console.log(Errores_1.errores[index]);
+        }
     }
     listen() {
         return __awaiter(this, void 0, void 0, function* () {
