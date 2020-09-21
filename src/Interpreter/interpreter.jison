@@ -15,6 +15,8 @@
     const {Function} = require('../Instruction/Function');
     const {Return} = require('../Instruction/Return');
     const {For} = require('../Instruction/For');
+    const {Cases} =  require("../Instruction/Cases");
+    const {Switch} =  require("../Instruction/Switch");
     let tv = null;
     let t1 = null;
     let t2 = null;
@@ -257,7 +259,7 @@ unarOpr
 ;
 
 statSwitch
-    : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = null;}
+    : SWITCH '(' genExpr ')' '{' swCases '}'  { $$ = new Switch($3, $6, @1.first_line,@1.first_column);}
 ;
 
 /*fix pusher*/
@@ -267,8 +269,8 @@ swCases
 ;
 
 swCase
-    : CASE genExpr ':'  Instructions  { $$ = null; }
-    | DEFAULT ':'  Instructions  { $$ = null; } 
+    : CASE genExpr ':'  Instructions  { $$ = new Cases(0,$2, new Statement($4, @1.first_line, @1.first_column), @1.first_line, @1.first_column); }
+    | DEFAULT ':'  Instructions  { $$ = new Cases(1, null, new Statement($3, @1.first_line, @1.first_column), @1.first_line, @1.first_column); } 
 ;
 
 statBreak 
@@ -345,6 +347,7 @@ otro
     | STRING            { $$ = new Literal($1, @1.first_line, @1.first_column, 2); }
     | ID                { $$ = new Access($1, @1.first_line, @1.first_column); }
     | '!' genExpr       { $$ = new Relational($1, $1, RelationalOption.NOT, @1.first_line, @1.first_column); }
+    | '-'genExpr        { $$ = new Arithmetic(new Literal(-1, @1.first_line, @1.first_column, 0), $2, ArithmeticOption.BY, @1.first_line,@1.first_column); }
     | statCall2          { $$ = $1; }
 ;
 

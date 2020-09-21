@@ -17,7 +17,6 @@ class While extends Instruction_1.Instruction {
         while (condition.value == true) {
             const element = this.code.execute(env);
             if (element != null || element != undefined) {
-                console.log(element);
                 if (element.type == 'Break')
                     break;
                 else if (element.type == 'Continue')
