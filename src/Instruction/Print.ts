@@ -1,6 +1,7 @@
 import { Instruction } from "../Abstract/Instruction";
 import { Expression } from "../Abstract/Expression";
 import { Environment } from "../Symbol/Environment";
+import {cons} from "../app"
 
 export class Print extends Instruction{
 
@@ -10,6 +11,7 @@ export class Print extends Instruction{
 
     public execute(environment : Environment) {
         const value = this.value.execute(environment);
-        console.log(value.value);
+        //console.log(value.value);
+        cons.push(value.value);
     }
 }

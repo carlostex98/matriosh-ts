@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+    <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+
+    <title>matriosh-ts</title>
+</head>
+
+<body>
+    <!-- Image and text -->
+    <nav class="navbar fixed-top bg-dark">
+        <a class="navbar-brand" href="#">
+            <h1>Matriosh-ts </h1>
+        </a>
+    </nav>
+    <h1>Hello, world!</h1>
+
+
+    <div class="container">
+
+        <div class="form-group">
+            <label for="exampleFormControlTextarea1">Consola</label>
+            <textarea class="form-control" id="codigo" name="codigo" rows="20"><%= consola %></textarea>
+        </div>
+        <br>
+        <div id="graph" style="text-align: center;"></div>
+
+    </div>
+
+    <script>
+        //var l = '<%- grafo %>';
+        var graphviz = d3.select("#graph").graphviz()
+            .renderDot('<%- grafo %>');
+
+    </script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

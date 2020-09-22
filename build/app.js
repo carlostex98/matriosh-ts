@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.App = void 0;
+exports.App = exports.cons = void 0;
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -20,10 +20,12 @@ const Environment_1 = require("./Symbol/Environment");
 const Errores_1 = require("./Errores");
 const err_1 = require("./err");
 const Function_1 = require("./Instruction/Function");
+exports.cons = new Array();
 class App {
     constructor() {
         this.traduced = "";
         this.console_out = "";
+        this.grafo = "";
         this.parser = require('./gram/grammar');
         this.gst = require("./ast/ast");
         this.intr = require("./Interpreter/interpreter");
@@ -43,16 +45,24 @@ class App {
         });
         this.app.get('/compiled', (req, res) => {
             var m = {
-                trd: this.traduced
+                consola: this.console_out,
+                grafo: this.grafo
             };
-            res.render('traduced.ejs', m);
+            res.render('compiled.ejs', m);
         });
         this.app.post('/', (req, res) => {
-            //let n = this.gst.parser.parse(req.body.codigo);
+            let n = this.gst.parser.parse(req.body.codigo);
             let p = this.parser.parse(req.body.codigo);
-            this.traduced = p;
-            console.log(req.body.opt);
-            res.redirect('/traduced');
+            this.traduced = p[0];
+            this.grafo = n;
+            if (req.body.opt == 1) {
+                res.redirect('/traduced');
+            }
+            else {
+                this.interpreter(p[0]);
+                this.cons_join();
+                res.redirect('/compiled');
+            }
         });
     }
     settings() {
@@ -60,6 +70,13 @@ class App {
         this.app.set("views", path_1.default.join(__dirname, "views"));
         this.app.use(body_parser_1.default.json());
         this.app.use(body_parser_1.default.urlencoded({ extended: true }));
+    }
+    cons_join() {
+        this.console_out = "";
+        for (let i = 0; i < exports.cons.length; i++) {
+            this.console_out += exports.cons[i].toString() + "\n";
+        }
+        exports.cons = [];
     }
     interpreter(codigo) {
         const ast = this.intr.parse(codigo);

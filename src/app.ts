@@ -9,7 +9,7 @@ import { Environment } from "./Symbol/Environment";
 import { errores } from './Errores';
 import { Err } from "./err";
 import { Function } from "./Instruction/Function";
-
+export let cons : Array<any> = new Array();
 
 
 
@@ -19,6 +19,7 @@ export class App {
     private app: Application;
     private traduced: String = "";
     private console_out: String = "";
+    private grafo: String = "";
 
     public parser = require('./gram/grammar');
     public gst = require("./ast/ast");
@@ -44,21 +45,28 @@ export class App {
 
         this.app.get('/compiled', (req, res) => {
             var m = {
-                trd: this.traduced
-
+                consola: this.console_out,
+                grafo: this.grafo
             }
-            res.render('traduced.ejs', m);
+            res.render('compiled.ejs', m);
         });
 
         
 
         this.app.post('/', (req, res) => {
-            //let n = this.gst.parser.parse(req.body.codigo);
+            let n = this.gst.parser.parse(req.body.codigo);
             let p = this.parser.parse(req.body.codigo);
-            this.traduced = p;
-            console.log(req.body.opt);
             
-            res.redirect('/traduced');
+            this.traduced = p[0];
+            this.grafo = n;
+            if(req.body.opt==1){
+                res.redirect('/traduced');
+            }else{
+                this.interpreter(p[0]);
+                this.cons_join();
+                res.redirect('/compiled');
+            }
+            
         });
 
     }
@@ -67,6 +75,14 @@ export class App {
         this.app.set("views", path.join(__dirname, "views"));
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
+    }
+
+    public cons_join(){
+        this.console_out="";
+        for(let i = 0; i<cons.length; i++){
+            this.console_out+=cons[i].toString()+"\n";
+        }
+        cons = [];
     }
 
     public interpreter(codigo: string){

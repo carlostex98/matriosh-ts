@@ -1,6 +1,9 @@
 %{
-    //const {Arithmetic, ArithmeticOption} = require('../Expression/Arithmetic');
-    //import of all the needs
+    const {Err} = require('../err');
+    const {errores} = require('../Errores');
+
+
+
     function sr(a){
         var m = "";
         for (i = 0; i < a.length; i++) {
@@ -123,6 +126,7 @@ string2  (\'[^"]*\')
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		                return 'EOF'
+.                       { errores.push(new Err(yylloc.first_line, yylloc.first_column, 'lexico', yytext+" no pertenece al lenguaje")) ;}
 
 /lex
 
@@ -140,7 +144,7 @@ string2  (\'[^"]*\')
 
 Startup
     : Instructions EOF{
-        return formater($1);
+        return [formater($1), errores];
     }
 ;
 
@@ -167,6 +171,8 @@ instruction
     | statReturn       { $$ = $1; }
     | varAsig          { $$ = $1; }
     | unarOpr          { $$ = $1; }
+    | error ';'        { errores.push(new Err(this._$.first_line, this._$.first_column, 'Sintactico', yytext)) ;}
+
 ;
 
 statReturn
@@ -179,6 +185,7 @@ varDefinition
     | CONST ID '=' genExpr ';'  {$$ = sr([$1,$2,$3,$4,$5]);}
     | LET ID ';'                {$$ = sr([$1,$2,$3]);}
     | LET ID ':' typeVar '=' genExpr  ';'{$$ = sr([$1,$2,$3,$4,$5,$6,$7]);}
+    | CONST ID ':' typeVar '=' genExpr ';'  {$$ = sr([$1,$2,$3,$4,$5,$6,$7]);}
 ;
 
 
