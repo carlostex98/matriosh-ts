@@ -17,6 +17,7 @@
     const {For} = require('../Instruction/For');
     const {Cases} =  require("../Instruction/Cases");
     const {Switch} =  require("../Instruction/Switch");
+    const {Tsymbol} =  require("../Instruction/Tsymbol");
     let tv = null;
     let t1 = null;
     let t2 = null;
@@ -180,7 +181,7 @@ varAsig
 ;
 
 statGraph
-    : 'GP_TS' ';' { $$ = sr([$1,$2]); }
+    : GP_TS ';' { $$ = new Tsymbol(@1.first_line, @1.first_column); }
 ;
 statIf
     : IF '(' genExpr ')' subStat moreIf 

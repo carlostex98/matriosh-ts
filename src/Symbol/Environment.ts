@@ -60,6 +60,14 @@ export class Environment{
         return env;
     }
 
+    public print_symbol(){
+        return this.variables;
+    }
+
+    public print_func(){
+        return this.funciones;
+    }
+
     public setVar(id: string, valor: any, type: Type){
 
     }

@@ -50,6 +50,12 @@ class Environment {
         }
         return env;
     }
+    print_symbol() {
+        return this.variables;
+    }
+    print_func() {
+        return this.funciones;
+    }
     setVar(id, valor, type) {
     }
 }

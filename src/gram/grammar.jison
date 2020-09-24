@@ -194,7 +194,7 @@ varAsig
 ;
 
 statGraph
-    : 'GP_TS' ';' { $$ = sr([$1,$2]); }
+    : GP_TS ';' { $$ = sr([$1,$2]); }
 ;
 statIf
     : IF '(' genExpr ')' '{' Instructions '}' moreIf 

@@ -181,7 +181,7 @@ varAsig
 ;
 
 statGraph
-    : 'GP_TS' ';' { $$ = nuevoNodo("SYMBOL"); }
+    : GP_TS ';' { $$ = nuevoNodo("SYMBOL"); }
 ;
 statIf
     : IF '(' genExpr ')' '{' Instructions '}' moreIf 

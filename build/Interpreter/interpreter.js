@@ -131,7 +131,7 @@ case 36:
 this.$ = new Declaration($$[$0-3], $$[$0-1], _$[$0-3].first_line, _$[$0-3].first_column);
 break;
 case 38:
- this.$ = sr([$$[$0-1],$$[$0]]); 
+ this.$ = new Tsymbol(_$[$0-1].first_line, _$[$0-1].first_column); 
 break;
 case 39:
 
@@ -487,6 +487,7 @@ parse: function parse(input) {
     const {For} = require('../Instruction/For');
     const {Cases} =  require("../Instruction/Cases");
     const {Switch} =  require("../Instruction/Switch");
+    const {Tsymbol} =  require("../Instruction/Tsymbol");
     let tv = null;
     let t1 = null;
     let t2 = null;
