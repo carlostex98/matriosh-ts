@@ -31,20 +31,112 @@
 
         <div class="form-group">
             <label for="exampleFormControlTextarea1">Consola</label>
-            <textarea class="form-control" id="codigo" name="codigo" rows="20"><%= consola %></textarea>
+            <textarea class="form-control" id="codigo" name="codigo" rows="10" readonly><%= consola %></textarea>
         </div>
         <br>
-        <div id="graph" style="text-align: center;"></div>
+        
+        <div class="accordion" id="accordionExample">
+            <div class="card">
+                <div class="card-header" id="headingOne">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                            data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            AST
+                        </button>
+                    </h2>
+                </div>
 
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                    data-parent="#accordionExample">
+                    <div class="card-body">
+                        <div id="graph" style="text-align: center;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" id="headingTwo">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Tabla de simbolos
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Valor</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Linea</th>
+                                <th scope="col">Columna</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                <% simbolos.forEach(function(ert){ %>
+                                    <tr>
+                                        <td><%= ert[0][0]%></td>
+                                        <td><%= ert[0][1]%></td>
+                                        <td><%= ert[0][2]%></td>
+                                        <td><%= ert[0][3]%></td>
+                                        <td><%= ert[0][4]%></td>
+                                    </tr>
+                                <% })%>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" id="headingThree">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+                            data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Errores
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <th scope="col">Linea</th>
+                                <th scope="col">Columna</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Razon</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                <% errorcillos.forEach(function(ert){ %>
+                                    <tr>
+                                        <td><%= ert[0]%></td>
+                                        <td><%= ert[1]%></td>
+                                        <td><%= ert[2]%></td>
+                                        <td><%= ert[3]%></td>
+                                    </tr>
+                                <% })%>
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+
+
     <script>
-        //var l = '<%- grafo %>';
         var graphviz = d3.select("#graph").graphviz()
             .renderDot('<%- grafo %>');
 
     </script>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 

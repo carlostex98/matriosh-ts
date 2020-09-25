@@ -99,6 +99,7 @@ string2  (\'[^"]*\')
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		                return 'EOF'
+.                        {/* error */}
 
 /lex
 
@@ -143,13 +144,12 @@ instruction
     | varDefinition    { $$ = $1; }
     | statReturn       { $$ = $1; }
     | varAsig          { $$ = $1; }
-    | statArray        { $$ = $1; }
     | unarOpr          { $$ = $1; }
+    | error ';'        { /*nothing*/ }
 ;
 
 statReturn
     : RETURN genExpr ';'    { $$ = new Return($2, @1.first_line, @1.first_column);}
-    | RETURN varArray ';'   { $$ = null; }
     | RETURN  ';'           { $$ = new Return(null, @1.first_line, @1.first_column);}
 ;
 
@@ -157,27 +157,17 @@ varDefinition
     : LET ID '=' genExpr ';'    {$$ = new Declaration($2, $4, @1.first_line, @1.first_column);}
     | CONST ID '=' genExpr ';'  {$$ = new Declaration($2, $4, @1.first_line, @1.first_column);}
     | LET ID ';'                {$$ = null;}
-    | LET ID '=' varArray ';'   { $$ = null; }
     | LET ID ':' typeVar '=' genExpr  ';'{$$ = new Declaration($2, $6, @1.first_line, @1.first_column);}
+    | CONST ID ':' typeVar '=' genExpr  ';'{$$ = new Declaration($2, $6, @1.first_line, @1.first_column);}
 ;
 
 subStat
     : '{' Instructions '}'  { $$ = new Statement($2, @1.first_line, @1.first_column); }
 ;
 
-varArray
-    : '[' paramsCall ']' { $$ = $1 + $2 + $3;}
-    | '[' ']' { $$ = $1 + $2; }
-;
-
-statArray
-    : ID '.' PUSH '(' genExpr ')' ';'   { $$ = $1+$2+$3+$4+$5+$6+$7; }
-    | ID '.' POP '(' genExpr ')' ';'    { $$ = $1+$2+$3+$4+$5+$6+$7; }
-;
 
 varAsig
     : ID '=' genExpr ';' {$$ = new Declaration($1, $3, @1.first_line, @1.first_column);}
-    | ID '=' varArray ';' {$$ = null;}
 ;
 
 statGraph
@@ -279,7 +269,7 @@ statContinue
     : CONTINUE ';' { $$ = new Continue(@1.first_line, @1.first_column); }
 ;
 
-/* here comes the magic */
+
 statFunc 
     : FUNCTION ID '(' paramsFunc ')' ':' typeReturn subStat  
     {

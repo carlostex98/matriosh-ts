@@ -16,7 +16,7 @@ class Call extends Instruction_1.Instruction {
             const newEnv = new Environment_1.Environment(environment.getGlobal());
             for (let i = 0; i < this.expresiones.length; i++) {
                 const value = this.expresiones[i].execute(environment);
-                newEnv.guardar(func.parametros[i], value.value, value.type);
+                newEnv.guardar(func.parametros[i], value.value, value.type, this.line, this.column);
             }
             var f = func.statment.execute(newEnv);
             if (f != undefined) {

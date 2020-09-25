@@ -2,6 +2,7 @@ import { Instruction } from "../Abstract/Instruction";
 import { Environment } from "../Symbol/Environment";
 import { Expression } from "../Abstract/Expression";
 import { Retorno, Type } from "../Abstract/ret_v";
+import {vars} from "../app";
 
 export class Tsymbol extends Instruction {
 
@@ -10,9 +11,15 @@ export class Tsymbol extends Instruction {
     }
 
     public execute(environment: Environment) {
-        const func = environment.print_symbol();
-        const f2 = environment.print_func();
-        console.log(func);
-        console.log(f2);
+        const ff = environment.print_symbol();
+        const ee = environment.print_func();
+        //console.log(ee);
+        for (let i = 0; i < ff.length; i++) {
+            vars.push(ff); 
+        }
+
+        for (let i = 0; i < ee.length; i++) {
+            vars.push(ee); 
+        }
     }
 }

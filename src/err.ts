@@ -1,6 +1,6 @@
 export class Err{
     
-    constructor(private linea : number, private columna: number, private tipo : string, private razon : string){
+    constructor(public linea : number, public columna: number, public tipo : string, public razon : string){
 
     }
 }

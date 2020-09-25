@@ -9,8 +9,9 @@ class Declaration extends Instruction_1.Instruction {
         this.value = value;
     }
     execute(environment) {
+        //console.log(environment);
         const val = this.value.execute(environment);
-        environment.guardar(this.id, val.value, val.type);
+        environment.guardar(this.id, val.value, val.type, this.line, this.column);
     }
 }
 exports.Declaration = Declaration;

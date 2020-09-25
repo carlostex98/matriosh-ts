@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.App = exports.cons = void 0;
+exports.App = exports.errs = exports.vars = exports.cons = void 0;
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -21,6 +21,8 @@ const Errores_1 = require("./Errores");
 const err_1 = require("./err");
 const Function_1 = require("./Instruction/Function");
 exports.cons = new Array();
+exports.vars = new Array();
+exports.errs = new Array();
 class App {
     constructor() {
         this.traduced = "";
@@ -46,8 +48,12 @@ class App {
         this.app.get('/compiled', (req, res) => {
             var m = {
                 consola: this.console_out,
-                grafo: this.grafo
+                grafo: this.grafo,
+                simbolos: exports.vars,
+                errorcillos: exports.errs
             };
+            exports.errs = [];
+            exports.vars = [];
             res.render('compiled.ejs', m);
         });
         this.app.post('/', (req, res) => {
@@ -103,8 +109,13 @@ class App {
                 Errores_1.errores.push(error);
             }
         }
-        for (let index = 0; index < Errores_1.errores.length; index++) {
-            console.log(Errores_1.errores[index]);
+        this.err_format();
+    }
+    err_format() {
+        let f = null;
+        for (let i = 0; i < Errores_1.errores.length; i++) {
+            f = Errores_1.errores[i];
+            exports.errs.push([f.linea, f.columna, f.tipo, f.razon]);
         }
     }
     listen() {

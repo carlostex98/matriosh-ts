@@ -15,8 +15,9 @@ export class Declaration extends Instruction{
     }
 
     public execute(environment: Environment) {
+        //console.log(environment);
         const val = this.value.execute(environment);
-        environment.guardar(this.id, val.value, val.type);
+        environment.guardar(this.id, val.value, val.type, this.line, this.column);
     }
 
 }

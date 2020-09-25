@@ -9,7 +9,9 @@ import { Environment } from "./Symbol/Environment";
 import { errores } from './Errores';
 import { Err } from "./err";
 import { Function } from "./Instruction/Function";
-export let cons : Array<any> = new Array();
+export let cons: Array<any> = new Array();
+export let vars: Array<any> = new Array();
+export let errs: Array<any> = new Array();
 
 
 
@@ -46,27 +48,31 @@ export class App {
         this.app.get('/compiled', (req, res) => {
             var m = {
                 consola: this.console_out,
-                grafo: this.grafo
-            }
+                grafo: this.grafo, 
+                simbolos: vars,
+                errorcillos: errs
+            };
+            errs = [];
+            vars=[];
             res.render('compiled.ejs', m);
         });
 
-        
+
 
         this.app.post('/', (req, res) => {
             let n = this.gst.parser.parse(req.body.codigo);
             let p = this.parser.parse(req.body.codigo);
-            
+
             this.traduced = p[0];
             this.grafo = n;
-            if(req.body.opt==1){
+            if (req.body.opt == 1) {
                 res.redirect('/traduced');
-            }else{
+            } else {
                 this.interpreter(p[0]);
                 this.cons_join();
                 res.redirect('/compiled');
             }
-            
+
         });
 
     }
@@ -77,44 +83,49 @@ export class App {
         this.app.use(bodyParser.urlencoded({ extended: true }));
     }
 
-    public cons_join(){
-        this.console_out="";
-        for(let i = 0; i<cons.length; i++){
-            this.console_out+=cons[i].toString()+"\n";
+    public cons_join() {
+        this.console_out = "";
+        for (let i = 0; i < cons.length; i++) {
+            this.console_out += cons[i].toString() + "\n";
         }
         cons = [];
     }
 
-    public interpreter(codigo: string){
+    public interpreter(codigo: string) {
         const ast = this.intr.parse(codigo);
         const env = new Environment(null);
-        for(const instr of ast){
+        for (const instr of ast) {
             try {
-                if(instr instanceof Function)
+                if (instr instanceof Function)
                     instr.execute(env);
             } catch (error) {
-                errores.push(error);  
+                errores.push(error);
             }
         }
 
-        for(const instr of ast){
-            if(instr instanceof Function)
+        for (const instr of ast) {
+            if (instr instanceof Function)
                 continue;
             try {
                 const actual = instr.execute(env);
-                if(actual != null || actual != undefined){
+                if (actual != null || actual != undefined) {
                     errores.push(new Err(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
                 }
             } catch (error) {
-                errores.push(error);  
+                errores.push(error);
             }
         }
-
-        for (let index = 0; index < errores.length; index++) {
-            console.log(errores[index]);
-        }
+        this.err_format();
+        
     }
 
+    public err_format(){
+        let f = null;
+        for (let i = 0; i < errores.length; i++) {
+            f = errores[i];
+            errs.push([f.linea, f.columna, f.tipo, f.razon]);   
+        }
+    }
 
     async listen() {
         await this.app.listen(3000);
