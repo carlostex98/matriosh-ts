@@ -120,7 +120,7 @@ class App {
     }
     listen() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.app.listen(3000);
+            yield this.app.listen(process.env.PORT || 3000);
             console.log("Estamos al aire :p");
         });
     }
