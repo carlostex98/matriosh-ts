@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Environment = void 0;
 const Symbol_1 = require("./Symbol");
+const err_1 = require("../err");
 class Environment {
     constructor(anterior) {
         this.anterior = anterior;
@@ -9,25 +10,57 @@ class Environment {
         this.funciones = new Map();
         this.vary = new Map();
         this.varx = new Map();
+        this.tpx = new Map();
     }
-    guardar(id, valor, type, linea, columna) {
+    guardar(id, valor, type, linea, columna, tpx) {
         let env = this;
         while (env != null) {
             if (env.variables.has(id)) {
-                env.variables.set(id, new Symbol_1.Symbol(valor, id, type));
-                env.vary.set(id, linea);
-                env.varx.set(id, columna);
+                //validamos
+                var f = env.tpx.get(id);
+                if (f == 1) {
+                    //variable
+                    env.variables.set(id, new Symbol_1.Symbol(valor, id, type));
+                    env.vary.set(id, linea);
+                    env.varx.set(id, columna);
+                    env.tpx.set(id, tpx);
+                }
+                else {
+                    throw new err_1.Err(linea, columna, "Semantico", "No se puede reasignar una constante");
+                }
                 return;
             }
             env = env.anterior;
         }
-        this.variables.set(id, new Symbol_1.Symbol(valor, id, type));
-        this.vary.set(id, linea);
-        this.varx.set(id, columna);
+        if (this.variables.has(id)) {
+            var f = this.tpx.get(id);
+            if (f == 1) {
+                //variable
+                this.variables.set(id, new Symbol_1.Symbol(valor, id, type));
+                this.vary.set(id, linea);
+                this.varx.set(id, columna);
+                this.tpx.set(id, tpx);
+            }
+            else {
+                throw new err_1.Err(linea, columna, "Semantico", "No se puede reasignar una constante");
+            }
+        }
+        else {
+            this.variables.set(id, new Symbol_1.Symbol(valor, id, type));
+            this.vary.set(id, linea);
+            this.varx.set(id, columna);
+            this.tpx.set(id, tpx);
+        }
     }
-    guardarFuncion(id, funcion) {
+    guardarFuncion(id, funcion, line, column) {
         //TODO ver si la funcion ya existe, reportar error
-        this.funciones.set(id, funcion);
+        if (this.funciones.has(id)) {
+            //tiramos error
+            throw new err_1.Err(line, column, "Semantico", "La funcion ya existe");
+        }
+        else {
+            this.funciones.set(id, funcion);
+        }
     }
     getVar(id) {
         let env = this;
@@ -79,6 +112,7 @@ class Environment {
             }
             env = env.anterior;
         }
+        //console.log(general);
         return general;
     }
     print_func() {
@@ -91,8 +125,6 @@ class Environment {
             env = env.anterior;
         }
         return general;
-    }
-    setVar(id, valor, type) {
     }
 }
 exports.Environment = Environment;

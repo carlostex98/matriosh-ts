@@ -15,11 +15,12 @@ export class Tsymbol extends Instruction {
         const ee = environment.print_func();
         //console.log(ee);
         for (let i = 0; i < ff.length; i++) {
-            vars.push(ff); 
+            //console.log(ff[i]);
+            vars.push(ff[i]); 
         }
 
         for (let i = 0; i < ee.length; i++) {
-            vars.push(ee); 
+            vars.push(ee[i]); 
         }
     }
 }

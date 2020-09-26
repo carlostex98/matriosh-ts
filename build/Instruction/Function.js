@@ -10,7 +10,7 @@ class Function extends Instruction_1.Instruction {
         this.parametros = parametros;
     }
     execute(environment) {
-        environment.guardarFuncion(this.id, this);
+        environment.guardarFuncion(this.id, this, this.line, this.column);
     }
 }
 exports.Function = Function;

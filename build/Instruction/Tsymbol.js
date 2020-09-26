@@ -12,10 +12,11 @@ class Tsymbol extends Instruction_1.Instruction {
         const ee = environment.print_func();
         //console.log(ee);
         for (let i = 0; i < ff.length; i++) {
-            app_1.vars.push(ff);
+            //console.log(ff[i]);
+            app_1.vars.push(ff[i]);
         }
         for (let i = 0; i < ee.length; i++) {
-            app_1.vars.push(ee);
+            app_1.vars.push(ee[i]);
         }
     }
 }

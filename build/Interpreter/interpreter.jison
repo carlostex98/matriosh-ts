@@ -154,11 +154,9 @@ statReturn
 ;
 
 varDefinition
-    : LET ID '=' genExpr ';'    {$$ = new Declaration($2, $4, @1.first_line, @1.first_column);}
-    | CONST ID '=' genExpr ';'  {$$ = new Declaration($2, $4, @1.first_line, @1.first_column);}
-    | LET ID ';'                {$$ = null;}
-    | LET ID ':' typeVar '=' genExpr  ';'{$$ = new Declaration($2, $6, @1.first_line, @1.first_column);}
-    | CONST ID ':' typeVar '=' genExpr  ';'{$$ = new Declaration($2, $6, @1.first_line, @1.first_column);}
+    : LET ID '=' genExpr ';'    {$$ = new Declaration($2, $4, @1.first_line, @1.first_column,1);}
+    | CONST ID '=' genExpr ';'  {$$ = new Declaration($2, $4, @1.first_line, @1.first_column,2);}
+    | LET ID ';'                {$$ = new Declaration($2, $4, @1.first_line, @1.first_column,1);}
 ;
 
 subStat
@@ -199,9 +197,7 @@ statFor
 ;
 
 forVariant
-    : VAR ID OF ID                      { $$ = null; }
-    | VAR ID IN ID                      { $$ = null; }
-    | varFor ';' genExpr ';' pasoFor    { $$ = null; }
+    : varFor ';' genExpr ';' pasoFor    { $$ = null; }
 ;
 
 pasoFor
