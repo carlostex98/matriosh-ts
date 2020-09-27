@@ -60,7 +60,3 @@ export class Arithmetic extends Expression {
     }
 }
 
-/*
-    3 + 5 * "hola mundo";
-    Error
-*/

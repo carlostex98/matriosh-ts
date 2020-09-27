@@ -36,7 +36,7 @@ class For extends Instruction_1.Instruction {
             }
             condition = this.cnd.execute(env);
             if (condition.type != ret_v_1.Type.BOOLEAN) {
-                throw { error: "Not boolean expression", linea: this.line, columna: this.column };
+                throw { razon: "La expresion no es booleana", linea: this.line, columna: this.column, tipo: "semantico" };
             }
             this.incr.execute(env); //ejecuta incremento
         }

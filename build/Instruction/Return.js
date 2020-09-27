@@ -9,6 +9,7 @@ class Return extends Instruction_1.Instruction {
     }
     execute(environment) {
         const value = this.value.execute(environment);
+        //console.log(value);
         return { value: value.value, type: value.type };
     }
 }

@@ -54,6 +54,9 @@ class App {
             };
             exports.errs = [];
             exports.vars = [];
+            for (let i = 0; i < Errores_1.errores.length; i++) {
+                const element = Errores_1.errores.pop;
+            }
             res.render('compiled.ejs', m);
         });
         this.app.post('/', (req, res) => {
@@ -98,7 +101,6 @@ class App {
                     instr.execute(env);
             }
             catch (error) {
-                console.log(error);
                 Errores_1.errores.push(error);
             }
         }
@@ -112,6 +114,7 @@ class App {
                 }
             }
             catch (error) {
+                console.log(error);
                 Errores_1.errores.push(error);
             }
         }

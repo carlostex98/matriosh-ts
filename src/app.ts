@@ -54,6 +54,12 @@ export class App {
             };
             errs = [];
             vars=[];
+            for (let i = 0; i < errores.length; i++) {
+                const element = errores.pop;
+                
+            }
+
+
             res.render('compiled.ejs', m);
         });
 
@@ -104,7 +110,6 @@ export class App {
                 if (instr instanceof Function)
                     instr.execute(env);
             } catch (error) {
-                console.log(error);
                 errores.push(error);
             }
         }
@@ -118,6 +123,7 @@ export class App {
                     errores.push(new Err(actual.line, actual.column, 'Semantico', actual.type + ' fuera de un ciclo'));
                 }
             } catch (error) {
+                console.log(error);
                 errores.push(error);
             }
         }

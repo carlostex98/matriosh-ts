@@ -10,9 +10,11 @@ export class Print extends Instruction{
     }
 
     public execute(envx : Environment) {
+        
         const v = this.value.execute(envx);
-        //console.log(value.value);
-        //console.log(v);
-        cons.push(v.value);//hacemos un push de lo que se mostrara en consoleax
+        if(v!=undefined){
+            cons.push(v.value);
+        }
+        //hacemos un push de lo que se mostrara en consoleax
     }
 }

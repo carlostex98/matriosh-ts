@@ -11,6 +11,7 @@ export class Return extends Instruction{
 
     public execute(environment : Environment): Retorno {
         const value = this.value.execute(environment);
+        //console.log(value);
         return {value: value.value, type: value.type};
     }
     //pos un return bro

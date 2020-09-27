@@ -61,8 +61,4 @@ class Arithmetic extends Expression_1.Expression {
     }
 }
 exports.Arithmetic = Arithmetic;
-/*
-    3 + 5 * "hola mundo";
-    Error
-*/ 
 //# sourceMappingURL=Arithmetic.js.map

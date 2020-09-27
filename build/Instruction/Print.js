@@ -10,9 +10,10 @@ class Print extends Instruction_1.Instruction {
     }
     execute(envx) {
         const v = this.value.execute(envx);
-        //console.log(value.value);
-        //console.log(v);
-        app_1.cons.push(v.value); //hacemos un push de lo que se mostrara en consoleax
+        if (v != undefined) {
+            app_1.cons.push(v.value);
+        }
+        //hacemos un push de lo que se mostrara en consoleax
     }
 }
 exports.Print = Print;
