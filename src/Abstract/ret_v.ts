@@ -10,3 +10,5 @@ export type Retorno ={
     value : any,
     type : Type
 }
+
+//retorno xd

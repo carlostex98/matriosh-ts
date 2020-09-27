@@ -133,3 +133,17 @@ export class App {
     }
 
 }
+
+/**
+ * 
+ * Proyecto 1 de la clase de compiladores 2
+ * inspirado en el interprete de Erik Flores
+ * el cual fue de gran ayuda para no perder 
+ * tanto tiempo en la pregunta:
+ * ¿ por donde empiezo y como lo hago?
+ * 
+ * 
+ * **.*.**.*.*.*.*.*.*.**.*.*.*.*.*.*.**..*.*.*.*.**.*.*
+ * *.*.*.*.*.**.*.*.*.**.*.*.*.*.**.*.*.**.*.*.*.*.*.*.*
+ * -----------------------------------------------------
+ */

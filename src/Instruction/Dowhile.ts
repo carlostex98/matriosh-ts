@@ -9,10 +9,11 @@ export class Dowhile extends Instruction {
         super(line, column);
     }
 
+    //sigue la misma logica que el while solo que con un dowhile :p
     public execute(envr: Environment) {
         let cond = this.condition.execute(envr);
         if (cond.type != Type.BOOLEAN) {
-            throw { error: "Not boolean expression", linea: this.line, columna: this.column };
+            throw { error: "La expresion no es booleana", linea: this.line, columna: this.column };
         }
 
         do {
@@ -26,8 +27,8 @@ export class Dowhile extends Instruction {
             }
             cond = this.condition.execute(envr);
             if (cond.type != Type.BOOLEAN) {
-                throw { error: "Not boolean expression", linea: this.line, columna: this.column };
+                throw { error: "La expresion no es booleana", linea: this.line, columna: this.column };
             }
-        } while (cond.value == true);
+        } while (cond.value == true);//evalua :p
     }
 }

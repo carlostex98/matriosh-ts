@@ -6,11 +6,11 @@ import { Err } from "../err";
 
 export class Environment {
 
-    private variables: Map<string, Symbol>;
-    private vary: Map<string, number>;
-    private varx: Map<string, number>;
-    public funciones: Map<string, Function>;
-    public tpx: Map<string, number>;//one vari, two const
+    private variables: Map<string, Symbol>;//variables
+    private vary: Map<string, number>;//pos y var
+    private varx: Map<string, number>; //pos x var
+    public funciones: Map<string, Function>; //unciones
+    public tpx: Map<string, number>; //tipo func
 
     constructor(public anterior: Environment | null) {
         this.variables = new Map();
@@ -21,6 +21,7 @@ export class Environment {
     }
 
     public guardar(id: string, valor: any, type: Type, linea: number, columna: number, tpx: number) {
+        //guarda las variaqbles
         let env: Environment | null = this;
         while (env != null) {
             if (env.variables.has(id)) {
@@ -38,8 +39,10 @@ export class Environment {
                 return;
             }
             env = env.anterior;
+            //recorremos los demas envs
         }
 
+        //es el env principal, el main
         if (this.variables.has(id)) {
             var f = this.tpx.get(id);
             if (f == 1) {
@@ -62,10 +65,10 @@ export class Environment {
 
     }
 
+    //guarda func
     public guardarFuncion(id: string, funcion: Function, line: number, column: number) {
-        //TODO ver si la funcion ya existe, reportar error
         if (this.funciones.has(id)) {
-            //tiramos error
+            //tiramos error si la funcion ya existe en el env
             throw new Err(line, column, "Semantico", "La funcion ya existe");
         } else {
             this.funciones.set(id, funcion);
@@ -73,37 +76,46 @@ export class Environment {
 
     }
 
+    //obtiene var
     public getVar(id: string): Symbol | undefined | null {
-        let env: Environment | null = this;
-        while (env != null) {
-            if (env.variables.has(id)) {
-                return env.variables.get(id);
+        let envior: Environment | null = this;
+        while (envior != null) {
+            if (envior.variables.has(id)) {
+                return envior.variables.get(id);
             }
-            env = env.anterior;
+            envior = envior.anterior;
         }
-        return null;
+        return null;//en acces tira error si no existe
     }
 
+    //obtiene funccion
     public getFuncion(id: string): Function | undefined {
-        let env: Environment | null = this;
-        while (env != null) {
-            if (env.funciones.has(id)) {
-                return env.funciones.get(id);
+        let envx: Environment | null = this;
+        while (envx != null) {
+            if (envx.funciones.has(id)) {
+                //detecta la func en el map
+                return envx.funciones.get(id);
             }
-            env = env.anterior;
+            envx = envx.anterior;
         }
         return undefined;
     }
 
+    //env global
     public getGlobal(): Environment {
-        let env: Environment | null = this;
-        while (env?.anterior != null) {
+        let envg: Environment | null = this;
+        while (envg?.anterior != null) {
 
-            env = env.anterior;
+            envg = envg.anterior;
         }
-        return env;
+        return envg;
     }
 
+    /*
+    --------- imagen tabla de simbolos
+    */
+
+    //retorna la tabla de simbolos
     public print_symbol() {
 
         let general = [];
@@ -131,15 +143,15 @@ export class Environment {
             }
             env = env.anterior;
         }
-        //console.log(general);
         return general;
     }
 
+    //retorna las funciones
     public print_func() {
         let env: Environment | null = this;
         let general = [];
         while (env != null) {
-
+            //el valor del map ya contiene la ln y col
             for (let entry of env.funciones.entries()) {
                 general.push([entry[0], "Codigo", "Funcion", entry[1].line, entry[1].column]);
             }

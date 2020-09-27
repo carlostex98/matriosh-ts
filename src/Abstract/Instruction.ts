@@ -11,5 +11,25 @@ export abstract class Instruction {
     }
 
     public abstract execute(environment : Environment) : any;
+    //abstraccion de execute
 
 }
+
+/**
+ * 
+ * \
+ *  \
+ *   \
+ *    \
+ *     \
+ *      \
+ *       \   |........|
+ *       /   |........|
+ *      /
+ *     /
+ *    /
+ *   /
+ *  /
+ * /
+ *
+ */

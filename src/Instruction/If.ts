@@ -10,17 +10,17 @@ export class If extends Instruction{
         super(line, column);
     }
 
-    public execute(env : Environment) {
-        const condition = this.condition.execute(env);
+    public execute(envx : Environment) {
+        const condition = this.condition.execute(envx);
         if(condition.type != Type.BOOLEAN){
             throw {error: "La condicion no es booleana", linea: this.line, columna : this.column};
         }
 
         if(condition.value == true){
-            return this.code.execute(env);
+            return this.code.execute(envx);
         }
         else{
-            return this.elsSt?.execute(env);
+            return this.elsSt?.execute(envx);//retorna emse si y solo si existe
         }
     }
 }

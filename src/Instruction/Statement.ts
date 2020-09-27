@@ -13,11 +13,14 @@ export class Statement extends Instruction{
         for(const instr of this.code){
             try {
                 const element = instr.execute(newEnv);
-                if(element != undefined || element != null)
-                    return element;                
+                if(element != undefined || element != null){
+                    return element;  
+                }                 
             } catch (error) {
                 errores.push(error);
+                //push del error :p 
             }
+            //stx
         }
     }
 }

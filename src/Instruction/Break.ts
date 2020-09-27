@@ -11,4 +11,5 @@ export class Break extends Instruction{
     public execute(environment : Environment) {
         return {line : this.line, column: this.column, type : 'Break'};
     }
+    //un break sencillo
 }

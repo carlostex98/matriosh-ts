@@ -11,4 +11,5 @@ export class Function extends Instruction{
     public execute(environment : Environment) {
         environment.guardarFuncion(this.id, this, this.line, this.column);
     }
+    //solo guardamos la funcion en el map de envs
 }

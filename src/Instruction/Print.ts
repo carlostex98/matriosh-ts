@@ -9,9 +9,9 @@ export class Print extends Instruction{
         super(line, column);
     }
 
-    public execute(environment : Environment) {
-        const value = this.value.execute(environment);
+    public execute(envx : Environment) {
+        const v = this.value.execute(envx);
         //console.log(value.value);
-        cons.push(value.value);
+        cons.push(v.value);//hacemos un push de lo que se mostrara en consoleax
     }
 }

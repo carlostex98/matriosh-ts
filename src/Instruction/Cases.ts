@@ -5,6 +5,7 @@ import { Type } from "../Abstract/ret_v";
 
 export class Cases {
 
+    //esta clase solo encapsula el codigo, no lo ejecuta
     constructor(private tipo: number, private right : Expression, private code : Instruction, private line : number, private column : number){
         //super(line, column);
     }

@@ -14,7 +14,7 @@ export abstract class Expression {
 
     public abstract execute(environment: Environment) : Retorno;
 
-    public tipoDominante(t1 : Type, t2 : Type) : Type{
+    public tipoDominante(t1 : Type, t2 : Type) : Type{//se calcula el tipo dominate
         const calcType = tipos[t1][t2];
         return calcType;
     }

@@ -14,12 +14,13 @@ export class Declaration extends Instruction{
         this.id = id;
         this.value = value;
         this.tpx=tpx;
+        //registro de la linea y columna en la tabla de simbolos
     }
 
-    public execute(environment: Environment) {
-        //console.log(environment);
-        const val = this.value.execute(environment);
-        environment.guardar(this.id, val.value, val.type, this.line, this.column, this.tpx);
+    public execute(env: Environment) {
+        const val = this.value.execute(env);
+        env.guardar(this.id, val.value, val.type, this.line, this.column, this.tpx);
+        //guardamos la variable en el enviroment actual
     }
 
 }

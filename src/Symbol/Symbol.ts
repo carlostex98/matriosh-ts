@@ -1,5 +1,24 @@
 import { Type } from "../Abstract/ret_v";
 
+/**
+ * 
+ * \
+ *  \
+ *   \
+ *    \
+ *     \
+ *      \
+ *       \   |........|
+ *       /   |........|
+ *      /
+ *     /
+ *    /
+ *   /
+ *  /
+ * /
+ *
+ */
+
 export class Symbol{
     public valor :any;
     public id : string;
@@ -10,4 +29,24 @@ export class Symbol{
         this.id = id;
         this.type = type;
     }
+    //unidad minima
 }
+
+/**
+ * 
+ * \
+ *  \
+ *   \
+ *    \
+ *     \
+ *      \
+ *       \   |........|
+ *       /   |........|
+ *      /
+ *     /
+ *    /
+ *   /
+ *  /
+ * /
+ *
+ */
