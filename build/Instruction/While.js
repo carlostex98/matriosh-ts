@@ -9,10 +9,16 @@ class While extends Instruction_1.Instruction {
         this.condition = condition;
         this.code = code;
     }
+    /**
+     *
+     * un while bonito
+     * divide y venceras :p
+     *
+     */
     execute(env) {
         let condition = this.condition.execute(env);
         if (condition.type != ret_v_1.Type.BOOLEAN) {
-            throw { error: "Not boolean expression", linea: this.line, columna: this.column };
+            throw { error: "La expresion no es booleana", linea: this.line, columna: this.column };
         }
         while (condition.value == true) {
             const element = this.code.execute(env);
@@ -24,7 +30,7 @@ class While extends Instruction_1.Instruction {
             }
             condition = this.condition.execute(env);
             if (condition.type != ret_v_1.Type.BOOLEAN) {
-                throw { error: "Not boolean expression", linea: this.line, columna: this.column };
+                throw { error: "La expresion no es booleana", linea: this.line, columna: this.column };
             }
         }
     }

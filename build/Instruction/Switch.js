@@ -8,12 +8,20 @@ class Switch extends Instruction_1.Instruction {
         this.left = left;
         this.cases = cases;
     }
+    /**
+     *
+     * recibe un arrays de casos y luego evalua uno por uno
+     * haciendo uso de un for
+     * si recibe un break, rompe el switch para evitar la ejecusion de
+     * los demas casos :p
+     *
+     */
     execute(env) {
         for (let i = 0; i < this.cases.length; i++) {
             let casex = this.cases[i].execute(env);
             if (casex.tipo == 0) { //normal case
-                let left = this.left.execute(env);
-                let right = casex.right.execute(env);
+                let left = this.left.execute(env); //valor constante
+                let right = casex.right.execute(env); //valor de cada caso
                 if (left.value == right.value) {
                     let elementor = casex.code.execute(env);
                     if (elementor != null || elementor != undefined) {

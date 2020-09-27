@@ -60,8 +60,13 @@ export class App {
 
 
         this.app.post('/', (req, res) => {
-            let n = this.gst.parser.parse(req.body.codigo);
-            let p = this.parser.parse(req.body.codigo);
+            let mp = req.body.codigo;
+            for (let i = 0; i < mp.length; i++) {
+                mp = mp.replace("\'", "\"");
+            }
+            let n = this.gst.parser.parse(mp);
+            //let n = "";
+            let p = this.parser.parse(mp);
 
             this.traduced = p[0];
             this.grafo = n;
@@ -99,6 +104,7 @@ export class App {
                 if (instr instanceof Function)
                     instr.execute(env);
             } catch (error) {
+                console.log(error);
                 errores.push(error);
             }
         }

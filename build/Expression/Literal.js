@@ -10,10 +10,16 @@ class Literal extends Expression_1.Expression {
         this.type = type;
     }
     execute() {
-        if (this.type <= 1)
+        if (this.type < 1) {
             return { value: Number(this.value), type: ret_v_1.Type.NUMBER };
-        else
-            return { value: this.value, type: ret_v_1.Type.STRING };
+        }
+        else if (this.type == 1) {
+            let z = this.value.substr(1, this.value.length - 2);
+            return { value: z, type: this.type };
+        }
+        else {
+            return { value: this.value, type: this.type };
+        }
     }
 }
 exports.Literal = Literal;

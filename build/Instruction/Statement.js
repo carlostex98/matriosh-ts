@@ -14,12 +14,15 @@ class Statement extends Instruction_1.Instruction {
         for (const instr of this.code) {
             try {
                 const element = instr.execute(newEnv);
-                if (element != undefined || element != null)
+                if (element != undefined || element != null) {
                     return element;
+                }
             }
             catch (error) {
                 Errores_1.errores.push(error);
+                //push del error :p 
             }
+            //stx
         }
     }
 }

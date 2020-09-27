@@ -60,8 +60,7 @@ string2  (\'[^"]*\')
 "="                   return '='
 ":"                   return ':'
 
-"["                     return '['
-"]"                     return ']'
+
 
 "("                     return '('
 ")"                     return ')' 
@@ -86,8 +85,7 @@ string2  (\'[^"]*\')
 "let"                   return 'LET'
 "const"                 return 'CONST'
 "var"                   return 'VAR'
-"of"                    return 'OF'
-"in"                    return 'IN'
+
 
 /*value types*/
 "string"                return "T_STRING"
@@ -95,21 +93,22 @@ string2  (\'[^"]*\')
 "boolean"               return "T_BOOLEAN"
 "void"                  return "T_VOID"
 "graficar_ts"           return "GP_TS"
+"true"                  return 'TRUE'
+"false"                 return 'FALSE'
 
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		                return 'EOF'
-.                        {/* error */}
+.                        {/* error */  }
 
 /lex
 
-%left '!'
-%left '||'
-%left '&&'
+
+%left '!' '&&' '||'
 %left '==', '!='
 %left '>=', '<=', '<', '>'
 %left '+' '-'
-%left '*' '/'
+%left '**' '*' '/'
 
 %start Startup 
 
@@ -169,7 +168,7 @@ varAsig
 ;
 
 statGraph
-    : GP_TS ';' { $$ = new Tsymbol(@1.first_line, @1.first_column); }
+    : GP_TS '(' ')' ';' { $$ = new Tsymbol(@1.first_line, @1.first_column); }
 ;
 statIf
     : IF '(' genExpr ')' subStat moreIf 
@@ -307,7 +306,9 @@ statConsole
 ;
 
 genExpr 
-    : genExpr '+' genExpr { $$ = new Arithmetic($1, $3, ArithmeticOption.PLUS, @1.first_line,@1.first_column); }
+    : genExpr '||' genExpr { $$ = new Relational($1, $3,RelationalOption.OR, @1.first_line, @1.first_column); }
+    | genExpr '&&' genExpr { $$ = new Relational($1, $3,RelationalOption.AND, @1.first_line, @1.first_column); }
+    | genExpr '+' genExpr { $$ = new Arithmetic($1, $3, ArithmeticOption.PLUS, @1.first_line,@1.first_column); }
     | genExpr '-' genExpr { $$ = new Arithmetic($1, $3, ArithmeticOption.MINUS, @1.first_line,@1.first_column); }
     | genExpr '**' genExpr { $$ = new Arithmetic($1, $3, ArithmeticOption.POW, @1.first_line,@1.first_column); }
     | genExpr '*' genExpr { $$ = new Arithmetic($1, $3, ArithmeticOption.BY, @1.first_line,@1.first_column); }
@@ -318,21 +319,21 @@ genExpr
     | genExpr '>' genExpr { $$ = new Relational($1, $3,RelationalOption.GREATER, @1.first_line, @1.first_column); }
     | genExpr '==' genExpr { $$ = new Relational($1, $3,RelationalOption.EQUAL, @1.first_line, @1.first_column); }
     | genExpr '!=' genExpr { $$ = new Relational($1, $3,RelationalOption.NOTEQUAL, @1.first_line, @1.first_column); }
-    | genExpr '&&' genExpr { $$ = new Relational($1, $3,RelationalOption.AND, @1.first_line, @1.first_column); }
     | genExpr '%' genExpr { $$ = new Arithmetic($1, $3, ArithmeticOption.MOD, @1.first_line,@1.first_column); }
-    | genExpr '||' genExpr { $$ = new Relational($1, $3,RelationalOption.OR, @1.first_line, @1.first_column); }
     | otro { $$ = $1; }
 ;
 
 otro
     : '(' genExpr ')'   { $$ = $2; }
     | NUMBER            { $$ = new Literal($1, @1.first_line, @1.first_column, 0); }
-    | DECIMAL           { $$ = new Literal($1, @1.first_line, @1.first_column, 1); }
-    | STRING            { $$ = new Literal($1, @1.first_line, @1.first_column, 2); }
+    | DECIMAL           { $$ = new Literal($1, @1.first_line, @1.first_column, 0); }
+    | STRING            { $$ = new Literal($1, @1.first_line, @1.first_column, 1); }
     | ID                { $$ = new Access($1, @1.first_line, @1.first_column); }
-    | '!' genExpr       { $$ = new Relational($1, $1, RelationalOption.NOT, @1.first_line, @1.first_column); }
+    | '!' genExpr       { $$ = new Relational($2, $2, RelationalOption.NOT, @1.first_line, @1.first_column); }
     | '-'genExpr        { $$ = new Arithmetic(new Literal(-1, @1.first_line, @1.first_column, 0), $2, ArithmeticOption.BY, @1.first_line,@1.first_column); }
     | statCall2          { $$ = $1; }
+    | TRUE              { $$ = new Literal(true, @1.first_line, @1.first_column, 2); }
+    | FALSE             { $$ = new Literal(false, @1.first_line, @1.first_column, 2); }
 ;
 
 statCall2

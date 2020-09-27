@@ -22,7 +22,7 @@
     function makeReport(k){
         let g = nuevoNodo("MAIN PROGRAM");
         creaRelaciones(g, k);
-        let rs = "digraph G { ";
+        let rs = "digraph G {  node [shape=record fontname=Arial]; ";
         for (i = 0; i < nodos.length; i++) {
             rs+=nodos[i];
         }
@@ -41,17 +41,18 @@
 %lex
 %options case-insensitive
 number  [0-9]+
-decimal {entero}"."{entero}
-string  (\"[^"]*\")
-string2  (\'[^"]*\')
+decimal {number}[.]{number}
+string  (\"[^\"]*\")	
+string2  (\'[^"]*\')	
 %%
 \s+                   /* skip whitespace */
 [/][/].*                                {}  //una linea
 [/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]	    {} //multilinea
-{number}                return 'NUMBER'
 {decimal}               return 'DECIMAL'
+{number}                return 'NUMBER'
+{string2}               return 'STRING2'
 {string}                return 'STRING'
-{string2}               return 'STRING'
+
 "**"                     return '**'
 "*"                     return '*'
 "/"                     return '/'
@@ -75,8 +76,6 @@ string2  (\'[^"]*\')
 "="                   return '='
 ":"                   return ':'
 
-"["                     return '['
-"]"                     return ']'
 
 "("                     return '('
 ")"                     return ')' 
@@ -101,8 +100,9 @@ string2  (\'[^"]*\')
 "let"                   return 'LET'
 "const"                 return 'CONST'
 "var"                   return 'VAR'
-"of"                    return 'OF'
-"in"                    return 'IN'
+"true"                  return 'TRUE'
+"false"                 return 'FALSE'
+
 
 /*value types*/
 "string"                return "T_STRING"
@@ -114,7 +114,7 @@ string2  (\'[^"]*\')
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		                return 'EOF'
-.                       {/* errorcillo */}
+.                       {/* errorcillo */ console.log("yep");}
 
 /lex
 
@@ -155,11 +155,12 @@ instruction
     | statCreateVar    { $$ = $1; }
     | statConsole      { $$ = $1; }
     | statCall ';'        { $$ = $1; }
+    | unarOpr           {$$=$1}
     | statIncremento   { $$ = $1; }
     | varDefinition    { $$ = $1; }
     | statReturn       { $$ = $1; }
     | varAsig          { $$ = $1; }
-    | error ';'        {/*errorcillo*/}
+    | error ';'        {/*errorcillo*/ console.log(this._$.first_line, this._$.first_column, 'Sintactico', yytext); }
 ;
 
 statReturn
@@ -181,7 +182,7 @@ varAsig
 ;
 
 statGraph
-    : GP_TS ';' { $$ = nuevoNodo("SYMBOL"); }
+    : GP_TS '(' ')' ';' { $$ = nuevoNodo("SYMBOL"); }
 ;
 statIf
     : IF '(' genExpr ')' '{' Instructions '}' moreIf 
@@ -269,13 +270,13 @@ statSwitch
         creaRelaciones(nx, [nuevoNodo("VALOR")]); 
         creaRelaciones(nx, [$3]);
         creaRelaciones(aux2,nuevoNodo("CASES"));
-        creaRelaciones(nx, $5);
+        creaRelaciones(nx, $6);
     }
 ;
 
 /*fix pusher*/
 swCases 
-    : swCase swCases {$1.push($2); $$=$1;}
+    : swCases swCase {$1.push($2); $$=$1;}
     | swCase {$$=[$1];}
 ;
 
@@ -305,7 +306,7 @@ statFunc
     : FUNCTION ID '(' paramsFunc ')'  '{' Instructions '}'  
         { 
             $$=nuevoNodo("FUNC"); 
-            let aux1 = nx;
+            aux1 = nx;
             creaRelaciones(aux1, [nuevoNodo("NOMB: "+$2) ]);
             creaRelaciones(aux1, [nuevoNodo("PARAMS")]);
             creaRelaciones(nx, $4);
@@ -362,9 +363,9 @@ genExpr
     | genExpr '>' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
     | genExpr '==' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
     | genExpr '!=' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
-    | genExpr '&&' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '&&' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo("AND"), $3]); }
     | genExpr '%' genExpr   { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
-    | genExpr '||' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo($2), $3]); }
+    | genExpr '||' genExpr  { $$ = nuevoNodo("EXPR"); creaRelaciones(nx, [$1, nuevoNodo("OR"), $3]); }
     | otro                  { $$ = $1; }
 ;
 
@@ -372,11 +373,14 @@ otro
     : '(' genExpr ')'   { $$ = nuevoNodo("PAR"); creaRelaciones(nx,[nuevoNodo("("),$2,nuevoNodo(')')]); }
     | NUMBER            { $$ = nuevoNodo($1+" (val)"); }
     | DECIMAL           { $$ = nuevoNodo($1+" (val)"); }
-    | STRING            { $$ = nuevoNodo($1.substr(1,$1.length-2)+" (val)");}
+    | STRING            { $$ = nuevoNodo($1.substr(1,$1.length-2)+" (val)"); }
+    | STRING2            { $$ = nuevoNodo($1.substr(1,$1.length-2)+" (val)"); }
     | ID                { $$ = nuevoNodo($1+" (ID)"); }
     | '-' genExpr       { $$ = nuevoNodo("MENOS"); creaRelaciones(nx,[$2]); }
     | '!' genExpr       { $$ = nuevoNodo("NOT"); creaRelaciones(nx,[$2]);}
     | statCall          { $$ = nuevoNodo("CALL"); creaRelaciones(nx,[$1]); }
+    | TRUE              { $$ = nuevoNodo("TRUE"); }
+    | FALSE             { $$ = nuevoNodo("FALSE"); }
 ;
 
 statCall 

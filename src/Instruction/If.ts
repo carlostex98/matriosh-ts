@@ -12,8 +12,10 @@ export class If extends Instruction{
 
     public execute(envx : Environment) {
         const condition = this.condition.execute(envx);
+        //console.log(condition);
         if(condition.type != Type.BOOLEAN){
-            throw {error: "La condicion no es booleana", linea: this.line, columna : this.column};
+            
+            throw {tipo: "Semantico",razon: "La condicion no es booleana", linea: this.line, columna : this.column};
         }
 
         if(condition.value == true){

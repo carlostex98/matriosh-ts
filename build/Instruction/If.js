@@ -10,17 +10,18 @@ class If extends Instruction_1.Instruction {
         this.code = code;
         this.elsSt = elsSt;
     }
-    execute(env) {
+    execute(envx) {
         var _a;
-        const condition = this.condition.execute(env);
+        const condition = this.condition.execute(envx);
+        //console.log(condition);
         if (condition.type != ret_v_1.Type.BOOLEAN) {
-            throw { error: "La condicion no es booleana", linea: this.line, columna: this.column };
+            throw { tipo: "Semantico", razon: "La condicion no es booleana", linea: this.line, columna: this.column };
         }
         if (condition.value == true) {
-            return this.code.execute(env);
+            return this.code.execute(envx);
         }
         else {
-            return (_a = this.elsSt) === null || _a === void 0 ? void 0 : _a.execute(env);
+            return (_a = this.elsSt) === null || _a === void 0 ? void 0 : _a.execute(envx); //retorna emse si y solo si existe
         }
     }
 }

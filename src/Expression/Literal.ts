@@ -8,9 +8,14 @@ export class Literal extends Expression{
     }
 
     public execute() : Retorno{
-        if(this.type <= 1)
+        if(this.type < 1){
             return {value : Number(this.value), type : Type.NUMBER};
-        else
-            return {value : this.value, type : Type.STRING};
+        } else if(this.type == 1){
+            let z = this.value.substr(1,this.value.length-2);
+            return {value : z, type : this.type};
+        } else {
+            return {value : this.value, type : this.type};
+        }
+            
     }
 }

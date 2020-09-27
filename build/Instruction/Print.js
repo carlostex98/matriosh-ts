@@ -8,10 +8,11 @@ class Print extends Instruction_1.Instruction {
         super(line, column);
         this.value = value;
     }
-    execute(environment) {
-        const value = this.value.execute(environment);
+    execute(envx) {
+        const v = this.value.execute(envx);
         //console.log(value.value);
-        app_1.cons.push(value.value);
+        //console.log(v);
+        app_1.cons.push(v.value); //hacemos un push de lo que se mostrara en consoleax
     }
 }
 exports.Print = Print;

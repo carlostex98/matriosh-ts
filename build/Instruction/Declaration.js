@@ -8,11 +8,12 @@ class Declaration extends Instruction_1.Instruction {
         this.id = id;
         this.value = value;
         this.tpx = tpx;
+        //registro de la linea y columna en la tabla de simbolos
     }
-    execute(environment) {
-        //console.log(environment);
-        const val = this.value.execute(environment);
-        environment.guardar(this.id, val.value, val.type, this.line, this.column, this.tpx);
+    execute(env) {
+        const val = this.value.execute(env);
+        env.guardar(this.id, val.value, val.type, this.line, this.column, this.tpx);
+        //guardamos la variable en el enviroment actual
     }
 }
 exports.Declaration = Declaration;

@@ -7,6 +7,15 @@ class Tsymbol extends Instruction_1.Instruction {
     constructor(line, column) {
         super(line, column);
     }
+    /**
+     *
+     * recibimos una camptura de la tabla de simbolos
+     * para hecer push a la que se mostrara en el navegador
+     * si vienen varios graficar_ts
+     * hara push de las variables que esten al alcance del contexto
+     * en donde fue llamado el graficar_ts
+     *
+     */
     execute(environment) {
         const ff = environment.print_symbol();
         const ee = environment.print_func();

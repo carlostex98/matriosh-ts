@@ -57,8 +57,13 @@ class App {
             res.render('compiled.ejs', m);
         });
         this.app.post('/', (req, res) => {
-            let n = this.gst.parser.parse(req.body.codigo);
-            let p = this.parser.parse(req.body.codigo);
+            let mp = req.body.codigo;
+            for (let i = 0; i < mp.length; i++) {
+                mp = mp.replace("\'", "\"");
+            }
+            let n = this.gst.parser.parse(mp);
+            //let n = "";
+            let p = this.parser.parse(mp);
             this.traduced = p[0];
             this.grafo = n;
             if (req.body.opt == 1) {
@@ -93,6 +98,7 @@ class App {
                     instr.execute(env);
             }
             catch (error) {
+                console.log(error);
                 Errores_1.errores.push(error);
             }
         }
@@ -126,4 +132,17 @@ class App {
     }
 }
 exports.App = App;
+/**
+ *
+ * Proyecto 1 de la clase de compiladores 2
+ * inspirado en el interprete de Erik Flores
+ * el cual fue de gran ayuda para no perder
+ * tanto tiempo en la pregunta:
+ * ¿ por donde empiezo y como lo hago?
+ *
+ *
+ * **.*.**.*.*.*.*.*.*.**.*.*.*.*.*.*.**..*.*.*.*.**.*.*
+ * *.*.*.*.*.**.*.*.*.**.*.*.*.*.**.*.*.**.*.*.*.*.*.*.*
+ * -----------------------------------------------------
+ */ 
 //# sourceMappingURL=app.js.map

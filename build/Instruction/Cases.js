@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Cases = void 0;
 class Cases {
+    //esta clase solo encapsula el codigo, no lo ejecuta
     constructor(tipo, right, code, line, column) {
         this.tipo = tipo;
         this.right = right;

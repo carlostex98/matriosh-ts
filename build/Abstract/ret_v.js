@@ -9,4 +9,5 @@ var Type;
     Type[Type["ARRAY"] = 3] = "ARRAY";
     Type[Type["NULL"] = 4] = "NULL";
 })(Type = exports.Type || (exports.Type = {}));
+//retorno xd
 //# sourceMappingURL=ret_v.js.map

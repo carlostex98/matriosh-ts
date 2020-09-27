@@ -13,82 +13,71 @@ class Environment {
         this.tpx = new Map();
     }
     guardar(id, valor, type, linea, columna, tpx) {
+        //guarda las variaqbles
         let env = this;
         while (env != null) {
             if (env.variables.has(id)) {
                 //validamos
-                var f = env.tpx.get(id);
-                if (f == 1) {
-                    //variable
-                    env.variables.set(id, new Symbol_1.Symbol(valor, id, type));
-                    env.vary.set(id, linea);
-                    env.varx.set(id, columna);
-                    env.tpx.set(id, tpx);
-                }
-                else {
-                    throw new err_1.Err(linea, columna, "Semantico", "No se puede reasignar una constante");
-                }
+                //variable
+                env.variables.set(id, new Symbol_1.Symbol(valor, id, type));
+                env.vary.set(id, linea);
+                env.varx.set(id, columna);
+                env.tpx.set(id, tpx);
                 return;
             }
             env = env.anterior;
+            //recorremos los demas envs
         }
-        if (this.variables.has(id)) {
-            var f = this.tpx.get(id);
-            if (f == 1) {
-                //variable
-                this.variables.set(id, new Symbol_1.Symbol(valor, id, type));
-                this.vary.set(id, linea);
-                this.varx.set(id, columna);
-                this.tpx.set(id, tpx);
-            }
-            else {
-                throw new err_1.Err(linea, columna, "Semantico", "No se puede reasignar una constante");
-            }
-        }
-        else {
-            this.variables.set(id, new Symbol_1.Symbol(valor, id, type));
-            this.vary.set(id, linea);
-            this.varx.set(id, columna);
-            this.tpx.set(id, tpx);
-        }
+        this.variables.set(id, new Symbol_1.Symbol(valor, id, type));
+        this.vary.set(id, linea);
+        this.varx.set(id, columna);
+        this.tpx.set(id, tpx);
     }
+    //guarda func
     guardarFuncion(id, funcion, line, column) {
-        //TODO ver si la funcion ya existe, reportar error
         if (this.funciones.has(id)) {
-            //tiramos error
+            //tiramos error si la funcion ya existe en el env
             throw new err_1.Err(line, column, "Semantico", "La funcion ya existe");
         }
         else {
             this.funciones.set(id, funcion);
         }
     }
+    //obtiene var
     getVar(id) {
-        let env = this;
-        while (env != null) {
-            if (env.variables.has(id)) {
-                return env.variables.get(id);
+        let envior = this;
+        while (envior != null) {
+            if (envior.variables.has(id)) {
+                return envior.variables.get(id);
             }
-            env = env.anterior;
+            envior = envior.anterior;
         }
-        return null;
+        return null; //en acces tira error si no existe
     }
+    //obtiene funccion
     getFuncion(id) {
-        let env = this;
-        while (env != null) {
-            if (env.funciones.has(id)) {
-                return env.funciones.get(id);
+        let envx = this;
+        while (envx != null) {
+            if (envx.funciones.has(id)) {
+                //detecta la func en el map
+                return envx.funciones.get(id);
             }
-            env = env.anterior;
+            envx = envx.anterior;
         }
         return undefined;
     }
+    //env global
     getGlobal() {
-        let env = this;
-        while ((env === null || env === void 0 ? void 0 : env.anterior) != null) {
-            env = env.anterior;
+        let envg = this;
+        while ((envg === null || envg === void 0 ? void 0 : envg.anterior) != null) {
+            envg = envg.anterior;
         }
-        return env;
+        return envg;
     }
+    /*
+    --------- imagen tabla de simbolos
+    */
+    //retorna la tabla de simbolos
     print_symbol() {
         let general = [];
         let env = this;
@@ -112,13 +101,14 @@ class Environment {
             }
             env = env.anterior;
         }
-        //console.log(general);
         return general;
     }
+    //retorna las funciones
     print_func() {
         let env = this;
         let general = [];
         while (env != null) {
+            //el valor del map ya contiene la ln y col
             for (let entry of env.funciones.entries()) {
                 general.push([entry[0], "Codigo", "Funcion", entry[1].line, entry[1].column]);
             }

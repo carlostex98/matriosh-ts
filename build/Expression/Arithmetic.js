@@ -26,17 +26,21 @@ class Arithmetic extends Expression_1.Expression {
         let result;
         const tipoDominante = this.tipoDominante(leftValue.type, rightValue.type);
         if (this.type == ArithmeticOption.PLUS) {
-            if (tipoDominante == ret_v_1.Type.STRING)
-                result = { value: (leftValue.value.toString() + rightValue.value.toString()), type: ret_v_1.Type.NUMBER };
-            else if (tipoDominante == ret_v_1.Type.NUMBER)
+            if (tipoDominante == ret_v_1.Type.STRING) {
+                //console.log(leftValue.value.toString());
+                result = { value: (leftValue.value.toString().concat(rightValue.value.toString())), type: ret_v_1.Type.STRING };
+            }
+            else if (tipoDominante == ret_v_1.Type.NUMBER) {
                 result = { value: (leftValue.value + rightValue.value), type: ret_v_1.Type.NUMBER };
-            else
+            }
+            else {
                 throw new err_1.Err(this.line, this.column, 'Semantico', 'No se puede operar: ' + leftValue.type + ' _ ' + rightValue.type);
+            }
         }
         else if (this.type == ArithmeticOption.MINUS) {
             if (tipoDominante == ret_v_1.Type.STRING)
                 throw new err_1.Err(this.line, this.column, 'Semantico', 'No se puede operar: ' + leftValue.type + ' _ ' + rightValue.type);
-            result = { value: (leftValue.value - rightValue.value), type: ret_v_1.Type.NUMBER };
+            result = { value: (leftValue.value - rightValue.value), type: ret_v_1.Type.BOOLEAN };
         }
         else if (this.type == ArithmeticOption.BY) {
             result = { value: (leftValue.value * rightValue.value), type: ret_v_1.Type.NUMBER };

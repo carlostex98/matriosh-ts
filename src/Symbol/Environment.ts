@@ -26,40 +26,25 @@ export class Environment {
         while (env != null) {
             if (env.variables.has(id)) {
                 //validamos
-                var f = env.tpx.get(id);
-                if (f == 1) {
+                
                     //variable
                     env.variables.set(id, new Symbol(valor, id, type));
                     env.vary.set(id, linea);
                     env.varx.set(id, columna);
                     env.tpx.set(id, tpx);
-                } else {
-                    throw new Err(linea, columna, "Semantico", "No se puede reasignar una constante");
-                }
+                
                 return;
             }
             env = env.anterior;
             //recorremos los demas envs
         }
 
-        //es el env principal, el main
-        if (this.variables.has(id)) {
-            var f = this.tpx.get(id);
-            if (f == 1) {
-                //variable
-                this.variables.set(id, new Symbol(valor, id, type));
-                this.vary.set(id, linea);
-                this.varx.set(id, columna);
-                this.tpx.set(id, tpx);
-            } else {
-                throw new Err(linea, columna, "Semantico", "No se puede reasignar una constante");
-            }
-        }else{
+        
             this.variables.set(id, new Symbol(valor, id, type));
             this.vary.set(id, linea);
             this.varx.set(id, columna);
             this.tpx.set(id, tpx);
-        }
+        
 
 
 

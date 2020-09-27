@@ -87,8 +87,6 @@ string2  (\'[^"]*\')
 "="                   return '='
 ":"                   return ':'
 
-"["                     return '['
-"]"                     return ']'
 
 "("                     return '('
 ")"                     return ')' 
@@ -113,8 +111,8 @@ string2  (\'[^"]*\')
 "let"                   return 'LET'
 "const"                 return 'CONST'
 "var"                   return 'VAR'
-"of"                    return 'OF'
-"in"                    return 'IN'
+"true"                  return 'TRUE'
+"false"                 return 'FALSE'
 
 /*value types*/
 "string"                return "T_STRING"
@@ -126,7 +124,7 @@ string2  (\'[^"]*\')
 
 ([a-zA-Z_])[a-zA-Z0-9_ñÑ]*	return 'ID';
 <<EOF>>		                return 'EOF'
-.                       { errores.push(new Err(yylloc.first_line, yylloc.first_column, 'lexico', yytext+" no pertenece al lenguaje")) ;}
+.                       { errores.push(new Err(yylloc.first_line, yylloc.first_column, 'lexico', yytext+" no pertenece al lenguaje")); }
 
 /lex
 
@@ -171,7 +169,7 @@ instruction
     | statReturn       { $$ = $1; }
     | varAsig          { $$ = $1; }
     | unarOpr          { $$ = $1; }
-    | error ';'        { errores.push(new Err(this._$.first_line, this._$.first_column, 'Sintactico', yytext)) ;}
+    | error ';'        { errores.push(new Err(this._$.first_line, this._$.first_column, 'Sintactico', yytext)) ;  }
 
 ;
 
@@ -194,7 +192,7 @@ varAsig
 ;
 
 statGraph
-    : GP_TS ';' { $$ = sr([$1,$2]); }
+    : GP_TS '(' ')' ';' { $$ = sr([$1,$2,$3,$4]); }
 ;
 statIf
     : IF '(' genExpr ')' '{' Instructions '}' moreIf 
@@ -328,6 +326,8 @@ otro
     | '-' genExpr       { $$ = $1 + $2; }
     | '!' genExpr       { $$ = $1 + $2; }
     | statCall2          { $$ = $1; }
+    | TRUE              {$$=$1;}
+    | FALSE             { $$=$1; }
 ;
 
 statCall2

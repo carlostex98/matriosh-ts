@@ -9,10 +9,11 @@ class Dowhile extends Instruction_1.Instruction {
         this.condition = condition;
         this.code = code;
     }
+    //sigue la misma logica que el while solo que con un dowhile :p
     execute(envr) {
         let cond = this.condition.execute(envr);
         if (cond.type != ret_v_1.Type.BOOLEAN) {
-            throw { error: "Not boolean expression", linea: this.line, columna: this.column };
+            throw { error: "La expresion no es booleana", linea: this.line, columna: this.column };
         }
         do {
             const element = this.code.execute(envr);
@@ -25,9 +26,9 @@ class Dowhile extends Instruction_1.Instruction {
             }
             cond = this.condition.execute(envr);
             if (cond.type != ret_v_1.Type.BOOLEAN) {
-                throw { error: "Not boolean expression", linea: this.line, columna: this.column };
+                throw { error: "La expresion no es booleana", linea: this.line, columna: this.column };
             }
-        } while (cond.value == true);
+        } while (cond.value == true); //evalua :p
     }
 }
 exports.Dowhile = Dowhile;

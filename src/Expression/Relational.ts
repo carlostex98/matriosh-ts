@@ -57,6 +57,7 @@ export class Relational extends Expression {
         }
         else if (this.type == RelationalOption.NOT) {
             const result = ! leftValue.value;
+            //console.log(result);
             return { value: result, type: Type.BOOLEAN };
         }
         return { value: 0, type: Type.NUMBER }

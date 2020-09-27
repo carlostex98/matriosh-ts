@@ -8,4 +8,22 @@ class Instruction {
     }
 }
 exports.Instruction = Instruction;
+/**
+ *
+ * \
+ *  \
+ *   \
+ *    \
+ *     \
+ *      \
+ *       \   |........|
+ *       /   |........|
+ *      /
+ *     /
+ *    /
+ *   /
+ *  /
+ * /
+ *
+ */ 
 //# sourceMappingURL=Instruction.js.map

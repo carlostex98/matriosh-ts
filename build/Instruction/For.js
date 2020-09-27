@@ -17,6 +17,11 @@ class For extends Instruction_1.Instruction {
         if (condition.type != ret_v_1.Type.BOOLEAN) {
             throw { error: "Not boolean expression", linea: this.line, columna: this.column };
         }
+        /**
+         * es un while solo que al final de cada iteracion executa el incremento
+         *
+         *
+         */
         while (condition.value == true) {
             //console.log("si");
             const element = this.code.execute(env);
@@ -33,7 +38,7 @@ class For extends Instruction_1.Instruction {
             if (condition.type != ret_v_1.Type.BOOLEAN) {
                 throw { error: "Not boolean expression", linea: this.line, columna: this.column };
             }
-            this.incr.execute(env);
+            this.incr.execute(env); //ejecuta incremento
         }
     }
 }
