@@ -14,4 +14,11 @@ class Return extends Instruction_1.Instruction {
     }
 }
 exports.Return = Return;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=Return.js.map

@@ -17,4 +17,11 @@ class Declaration extends Instruction_1.Instruction {
     }
 }
 exports.Declaration = Declaration;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */
 //# sourceMappingURL=Declaration.js.map

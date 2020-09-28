@@ -66,4 +66,11 @@ class Relational extends Expression_1.Expression {
     }
 }
 exports.Relational = Relational;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=Relational.js.map

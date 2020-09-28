@@ -17,4 +17,11 @@ class Print extends Instruction_1.Instruction {
     }
 }
 exports.Print = Print;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=Print.js.map

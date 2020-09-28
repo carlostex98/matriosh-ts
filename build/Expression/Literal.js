@@ -23,4 +23,11 @@ class Literal extends Expression_1.Expression {
     }
 }
 exports.Literal = Literal;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=Literal.js.map

@@ -10,4 +10,11 @@ var Type;
     Type[Type["NULL"] = 4] = "NULL";
 })(Type = exports.Type || (exports.Type = {}));
 //retorno xd
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=ret_v.js.map

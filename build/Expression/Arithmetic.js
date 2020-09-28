@@ -61,4 +61,11 @@ class Arithmetic extends Expression_1.Expression {
     }
 }
 exports.Arithmetic = Arithmetic;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=Arithmetic.js.map

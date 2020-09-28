@@ -14,4 +14,11 @@ class Function extends Instruction_1.Instruction {
     }
 }
 exports.Function = Function;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=Function.js.map

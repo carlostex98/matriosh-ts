@@ -36,4 +36,11 @@ class While extends Instruction_1.Instruction {
     }
 }
 exports.While = While;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=While.js.map

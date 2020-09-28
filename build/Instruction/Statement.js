@@ -27,4 +27,11 @@ class Statement extends Instruction_1.Instruction {
     }
 }
 exports.Statement = Statement;
+/**
+ *
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ *
+ * pongo esto porque quede traumado con algo asi en el pasado :(
+ *
+ */ 
 //# sourceMappingURL=Statement.js.map

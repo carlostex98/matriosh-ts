@@ -25,5 +25,12 @@ exports.Instruction = Instruction;
  *  /
  * /
  *
- */ 
+ */
+/**
+*
+* Este codigo NO participo en plagio con los otros compañeros del curso
+*
+* pongo esto porque quede traumado con algo asi en el pasado :(
+*
+*/ 
 //# sourceMappingURL=Instruction.js.map
