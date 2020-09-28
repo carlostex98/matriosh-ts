@@ -18,3 +18,11 @@ export class Print extends Instruction{
         //hacemos un push de lo que se mostrara en consoleax
     }
 }
+
+/**
+ * 
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ * 
+ * pongo esto porque quede traumado con algo asi en el pasado :(    
+ * 
+ */

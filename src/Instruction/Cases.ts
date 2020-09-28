@@ -14,3 +14,11 @@ export class Cases {
         return {tipo: this.tipo, right: this.right, code: this.code, line: this.line, column: this.column};
     }
 }
+
+/**
+ * 
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ * 
+ * pongo esto porque quede traumado con algo asi en el pasado :(    
+ * 
+ */

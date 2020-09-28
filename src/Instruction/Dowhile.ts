@@ -32,3 +32,12 @@ export class Dowhile extends Instruction {
         } while (cond.value == true);//evalua :p
     }
 }
+
+
+/**
+ * 
+ * Este codigo NO participo en plagio con los otros compañeros del curso
+ * 
+ * pongo esto porque quede traumado con algo asi en el pasado :(    
+ * 
+ */
